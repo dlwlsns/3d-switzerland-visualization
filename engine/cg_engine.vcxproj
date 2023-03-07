@@ -22,14 +22,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -95,32 +95,22 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="cg_engine.cpp" />
-    <ClCompile Include="directionalLight.cpp" />
-    <ClCompile Include="light.cpp" />
-    <ClCompile Include="material.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="node.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="orthographicCamera.cpp" />
-    <ClCompile Include="pointLight.cpp" />
     <ClCompile Include="perspectiveCamera.cpp" />
     <ClCompile Include="renderList.cpp" />
-    <ClCompile Include="spotLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="cg_engine.h" />
-    <ClInclude Include="directionalLight.h" />
-    <ClInclude Include="light.h" />
-    <ClInclude Include="material.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="orthographicCamera.h" />
-    <ClInclude Include="pointLight.h" />
     <ClInclude Include="perspectiveCamera.h" />
     <ClInclude Include="renderList.h" />
-    <ClInclude Include="spotLight.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

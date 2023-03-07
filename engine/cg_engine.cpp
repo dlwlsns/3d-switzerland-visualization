@@ -13,7 +13,6 @@
 
 // Engine
 #include "cg_engine.h"
-#include "spotLight.h"
 #include "renderList.h"
 
 
@@ -25,16 +24,9 @@ int windowId;
 
 // Elements
 Node* currentScene;
-std::vector<Material*> materials;
 std::vector<Camera*> cameras;
-std::vector<char*> guiText;
 int activeCam = 1;
 RenderList* renderlist;
-
-// Appearance
-int anisotropicLevel = 1;
-int filter = 0;
-bool wireframe = true;
 
 // FPS:
 int fps = 0;
@@ -55,36 +47,6 @@ CgEngine* CgEngine::getIstance() {
     if (!CgEngine::istance)
         CgEngine::istance = new CgEngine();
     return CgEngine::istance;
-}
-
-/**
- * This method cycle through the list of all cameras (except for the gui camera).
- */
-void CgEngine::cameraRotation() {
-    activeCam++;
-
-    if (activeCam >= cameras.size())
-        activeCam = 1;
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(glm::value_ptr(cameras[activeCam]->getProjection()));
-    glMatrixMode(GL_MODELVIEW);
-
-    glutPostWindowRedisplay(windowId);
-}
-
-/**
- * This method toggle the wireframe.
- */
-void CgEngine::toggleWireframe() {
-    wireframe = !wireframe;
-
-    if (wireframe)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    else
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    glutPostWindowRedisplay(windowId);
 }
 
 /**
@@ -110,27 +72,6 @@ void CgEngine::setIdleCallback(void (*func)()) {
 
 unsigned int CgEngine::getElapsedTime() {
     return glutGet(GLUT_ELAPSED_TIME);
-}
-
-/**
- * This method allows to change the filter.
- *
- * Supported filters: None, Linear, Bilinear, Trilinear.
- */
-void CgEngine::changeFilter() {
-    filter++;
-    if (filter >= 5)
-        filter = 0;
-
-
-    glutPostWindowRedisplay(windowId);
-}
-
-/**
- * This method add a line of text to the GUI.
- */
-void CgEngine::addGuiText(char* text) {
-    guiText.push_back(text);
 }
 
 /**
@@ -229,6 +170,7 @@ void displayCallback()
     glClearDepth(1.0f);
 
     glMatrixMode(GL_MODELVIEW);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // Render Nodes
     CgEngine::getIstance()->parse(currentScene);
@@ -243,10 +185,7 @@ void displayCallback()
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(glm::value_ptr(glm::mat4(1.0f)));
 
-    // Disable lighting before rendering 2D text:
-    glDisable(GL_LIGHTING);
-
-    glColor3f(1.0f, 1.0f, 1.0f);
+    glColor3f(0.0f, 0.0f, 1.0f);
 
     // Write some text:
     char text[64];
@@ -254,21 +193,8 @@ void displayCallback()
     glRasterPos2f(1.0f, 2.0f);
     glutBitmapString(GLUT_BITMAP_8_BY_13, (unsigned char*)text);
 
-    sprintf(text, "[c] camera cycle - Current camera: %s", cameras[activeCam]->getName());
-    glRasterPos2f(1.0f, 20.0f);
-    glutBitmapString(GLUT_BITMAP_8_BY_13, (unsigned char*)text);
-
-    for (int i = 0; i < guiText.size(); i++) {
-        sprintf(text, "%s", guiText[i]);
-        glRasterPos2f(1.0f, 40.0f + 20.0f * i);
-        glutBitmapString(GLUT_BITMAP_8_BY_13, (unsigned char*)text);
-    }
-
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(glm::value_ptr(cameras[activeCam]->getProjection()));
-
-    // Reactivate lighting:
-    glEnable(GL_LIGHTING);
 
     // Swap this context's buffer:  
     frames++;
@@ -387,11 +313,11 @@ bool CgEngine::init(int argc, char* argv[])
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
     // Set lighting options
-    glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
-    glEnable(GL_NORMALIZE);
+    //glEnable(GL_NORMALIZE);
 
-    glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
+    //glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
 
     // Set callback functions:
     glutDisplayFunc(displayCallback);

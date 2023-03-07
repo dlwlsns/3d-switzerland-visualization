@@ -4,7 +4,6 @@
 #include <GL/freeglut.h>
 
 #include "renderList.h"
-#include "light.h"
 #include "mesh.h"
 
 RenderItem::RenderItem(Object* object, glm::mat4 matrix) : object(object), matrix(matrix) {};
@@ -40,9 +39,9 @@ int RenderList::size() {
 }
 
 void RenderList::sort() {
-	std::sort(items.begin(), items.end(), [](const RenderItem obj1, const RenderItem obj2) -> int {
+	/*std::sort(items.begin(), items.end(), [](const RenderItem obj1, const RenderItem obj2) -> int {
 		return (((dynamic_cast<Light*>(obj1.object) != nullptr) ? 1 : 0) > ((dynamic_cast<Light*>(obj2.object) != nullptr ? 1 : 0)));
-	});
+	});*/
 }
 
 void RenderList::render(glm::mat4 inverseCamera_M) {

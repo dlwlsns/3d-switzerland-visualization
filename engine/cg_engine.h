@@ -28,8 +28,6 @@
 #include "mesh.h"
 #include "perspectiveCamera.h"
 #include "orthographicCamera.h"
-#include "pointLight.h"
-#include "directionalLight.h"
 
 
 /////////////

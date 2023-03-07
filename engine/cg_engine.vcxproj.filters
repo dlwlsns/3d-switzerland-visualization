@@ -13,14 +13,8 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\light">
-      <UniqueIdentifier>{b13f065b-70b4-4600-add3-c1c02b73693b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\camera">
       <UniqueIdentifier>{bedf98e1-52ec-44ae-ae6a-4ba2cb033bdf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\light">
-      <UniqueIdentifier>{0d3d345e-7c94-416b-982b-bfbd0d0c4c27}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\camera">
       <UniqueIdentifier>{12a0dc4b-5bcd-49c2-90ce-2eb71ae0426d}</UniqueIdentifier>
@@ -41,21 +35,6 @@
     </ClInclude>
     <ClInclude Include="renderList.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="light.h">
-      <Filter>Header Files\light</Filter>
-    </ClInclude>
-    <ClInclude Include="pointLight.h">
-      <Filter>Header Files\light</Filter>
-    </ClInclude>
-    <ClInclude Include="spotLight.h">
-      <Filter>Header Files\light</Filter>
-    </ClInclude>
-    <ClInclude Include="directionalLight.h">
-      <Filter>Header Files\light</Filter>
     </ClInclude>
     <ClInclude Include="camera.h">
       <Filter>Header Files\camera</Filter>
@@ -82,21 +61,6 @@
     </ClCompile>
     <ClCompile Include="renderList.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="light.cpp">
-      <Filter>Source Files\light</Filter>
-    </ClCompile>
-    <ClCompile Include="directionalLight.cpp">
-      <Filter>Source Files\light</Filter>
-    </ClCompile>
-    <ClCompile Include="spotLight.cpp">
-      <Filter>Source Files\light</Filter>
-    </ClCompile>
-    <ClCompile Include="pointLight.cpp">
-      <Filter>Source Files\light</Filter>
     </ClCompile>
     <ClCompile Include="camera.cpp">
       <Filter>Source Files\camera</Filter>
