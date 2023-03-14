@@ -4,6 +4,10 @@
 class LIB_API Mesh : public Node
 {
 	private:
+		unsigned int vaoGlobal;
+		unsigned int vboVertex;
+		unsigned int vboColor;
+		unsigned int vboFace;
 		std::vector<glm::vec3> verticies;
 		std::vector<unsigned int> faces;
 
@@ -15,6 +19,8 @@ class LIB_API Mesh : public Node
 		void addVertex(glm::vec3 vertex);
 		std::vector<glm::vec3> getVertecies();
 		void addFace(unsigned int face[3]);
+
+		void initVAO();
 
 		virtual void render(glm::mat4 inverseCamera_M);
 };

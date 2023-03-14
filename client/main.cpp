@@ -126,6 +126,8 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
     }
 
     std::cout << "verticies count: " << verticies.size() << std::endl;
+
+    plane->initVAO();
     return plane;
 }
 
