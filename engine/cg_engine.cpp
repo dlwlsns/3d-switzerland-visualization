@@ -188,7 +188,7 @@ void displayCallback()
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(glm::value_ptr(glm::mat4(1.0f)));
 
-    glColor3f(0.0f, 0.0f, 1.0f);
+    glColor3f(1.0f, 0.0f, 0.0f);
 
     // Write some text:
     char text[64];

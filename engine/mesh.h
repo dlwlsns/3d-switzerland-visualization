@@ -6,7 +6,6 @@ class LIB_API Mesh : public Node
 	private:
 		unsigned int vaoGlobal;
 		unsigned int vboVertex;
-		unsigned int vboColor;
 		unsigned int vboFace;
 		std::vector<glm::vec3> verticies;
 		std::vector<unsigned int> faces;

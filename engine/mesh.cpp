@@ -30,30 +30,19 @@ void Mesh::initVAO()
     glBindVertexArray(vaoGlobal);
 
     unsigned int N = verticies.size();
-    unsigned char* color = nullptr;
-    color = new unsigned char[3 * N];
-    for (int c = 0; c < 3 * N; c++)
-        color[c] = 255;
 
     glGenBuffers(1, &vboVertex);
     glBindBuffer(GL_ARRAY_BUFFER, vboVertex);
     glBufferData(GL_ARRAY_BUFFER, N * sizeof(glm::vec3), &verticies[0], GL_STATIC_DRAW);
-
-    glGenBuffers(1, &vboColor);
-    glBindBuffer(GL_ARRAY_BUFFER, vboColor);
-    glBufferData(GL_ARRAY_BUFFER, N * 3 * sizeof(unsigned char), color, GL_STATIC_DRAW);
 
     glGenBuffers(1, &vboFace);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboFace);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, faces.size() * sizeof(unsigned int), &faces[0], GL_STATIC_DRAW);
 
     glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
 
     glBindBuffer(GL_ARRAY_BUFFER, vboVertex);
     glVertexPointer(3, GL_FLOAT, 0, nullptr);
-    glBindBuffer(GL_ARRAY_BUFFER, vboColor);
-    glColorPointer(3, GL_UNSIGNED_BYTE, 0, nullptr);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboFace);
 
     glBindVertexArray(0);
