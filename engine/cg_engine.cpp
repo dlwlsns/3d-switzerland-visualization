@@ -305,7 +305,7 @@ bool CgEngine::init(int argc, char* argv[])
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 
     // Create the window with a specific title:   
-    windowId = glutCreateWindow("CG - The Crane");
+    windowId = glutCreateWindow("3D Switzerland Visualization");
 
     // The OpenGL context is now initialized...
     glEnable(GL_DEPTH_TEST);

@@ -14,6 +14,16 @@
 
 CgEngine* engine;
 Node* scene;
+Camera* staticCam;
+
+
+
+glm::vec3 cameraPos = glm::vec3(100.0f, 600.0f, 100.0f);
+glm::vec3 cameraFront = glm::vec3(500.0f, 400.0f, 500.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, -1.0f, 0.0f);
+glm::vec3 direction;
+float yaw, pitch = 0;
+
 
 Node* search(Node* node, char* name) {
     if (strcmp(node->getName(), name) == 0) {
@@ -39,9 +49,25 @@ Node* search(Node* node, char* name) {
  */
 void keyboardCallback(unsigned char key, int mouseX, int mouseY)
 {
+    const float cameraSpeed = 50.0f; // adjust accordingly
     switch (key)
     {
-        case 's': //hook/unhook objects
+        
+        case 'w':
+            staticCam->appendMatrix(glm::inverse(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 10.0f))));
+            //cameraPos -= cameraSpeed * cameraFront;
+            break;
+        case 's':
+            staticCam->appendMatrix(glm::inverse(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -10.0f))));
+            //cameraPos += cameraSpeed * cameraFront;
+            break;
+        case 'a':
+            staticCam->appendMatrix(glm::inverse(glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 0.0f, 0.0f))));
+            //cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            break;
+        case 'd':
+            staticCam->appendMatrix(glm::inverse(glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 0.0f, 0.0f))));
+            //cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
             break;
         default:
             break;
@@ -56,15 +82,21 @@ void keyboardCallback(unsigned char key, int mouseX, int mouseY)
  */
 void specialCallback(int key, int mouseX, int mouseY)
 {
+
     switch (key)
     {
         case 100://left
+            staticCam->appendMatrix(glm::inverse(glm::rotate(glm::mat4(1.0f), glm::radians(10.0f), glm::vec3(0.0f, 1.0f, 0.0f))));
             break;
         case 102://right
+            staticCam->appendMatrix(glm::inverse(glm::rotate(glm::mat4(1.0f), glm::radians(-10.0f), glm::vec3(0.0f, 1.0f, 0.0f))));
             break;
         case 101://up
+            staticCam->appendMatrix(glm::inverse(glm::rotate(glm::mat4(1.0f), glm::radians(10.0f), glm::vec3(1.0f, 0.0f, 0.0f))));
             break;
         case 103://down
+            
+            staticCam->appendMatrix(glm::inverse(glm::rotate(glm::mat4(1.0f), glm::radians(-10.0f), glm::vec3(1.0f, 0.0f, 0.0f))));
             break;
         default:
             break;
@@ -99,9 +131,14 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
     int y = 0;
 
     while (curZ < end) {
-        verticies.push_back(glm::vec3(curX, heights[x][y], curZ));//heights[x][y]-min      rand() % 10
-        //std::cout << heights[x][y] << std::endl;
-        plane->addVertex(verticies.back());
+        
+
+        if ((int)curX % 20 == 0) {
+            verticies.push_back(glm::vec3(curX, heights[x][y], curZ));//heights[x][y]-min      rand() % 10
+            //std::cout << heights[x][y] << std::endl;
+            plane->addVertex(verticies.back());
+        }
+        
 
         curX += triangleSize;
         x++;
@@ -186,10 +223,9 @@ int main(int argc, char* argv[]) {
     scene->addChild(drawGrid(2000.0f, 2000.0f, rasterBandData, min));
 
     // Add cameras to the scene
-    Camera* staticCam = new PerspectiveCamera("camera", 1.0f, 3000.0f, 45.0f, 1.0f);
-    glm::mat4 s_camera_M = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, 500.0f, 50.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(-2.0f), glm::vec3(1.0f, 0.0f, 1.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(220.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    staticCam = new PerspectiveCamera("camera", 1.0f, 3000.0f, 45.0f, 1.0f);
+    glm::mat4 s_camera_M = glm::translate(glm::mat4(1.0f), glm::vec3(200.0f, 600.0f, -500.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(240.0f), glm::vec3(0.0f, 1.0f, 0.0f));//* glm::rotate(glm::mat4(1.0f), glm::radians(-2.0f), glm::vec3(1.0f, 0.0f, 1.0f)) )
+    //glm::mat4 s_camera_M = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     staticCam->setObjectCoordinates(s_camera_M);
 
     scene->addChild(staticCam);
