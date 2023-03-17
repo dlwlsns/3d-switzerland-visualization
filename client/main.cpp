@@ -131,13 +131,8 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
     int y = 0;
 
     while (curZ < end) {
-        
-
-        if ((int)curX % 20 == 0) {
-            verticies.push_back(glm::vec3(curX, heights[x][y], curZ));//heights[x][y]-min      rand() % 10
-            //std::cout << heights[x][y] << std::endl;
-            plane->addVertex(verticies.back());
-        }
+        verticies.push_back(glm::vec3(curX, heights[x][y], curZ));
+        plane->addVertex(verticies.back());
         
 
         curX += triangleSize;
