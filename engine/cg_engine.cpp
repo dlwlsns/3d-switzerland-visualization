@@ -8,6 +8,9 @@
 #include <iostream>
 #include <vector>
 
+// Glew (include it before GL.h):
+#include <GL/glew.h>
+
 // FreeGLUT:   
 #include <GL/freeglut.h>
 
@@ -185,7 +188,7 @@ void displayCallback()
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(glm::value_ptr(glm::mat4(1.0f)));
 
-    glColor3f(0.0f, 0.0f, 1.0f);
+    glColor3f(1.0f, 0.0f, 0.0f);
 
     // Write some text:
     char text[64];
@@ -306,6 +309,17 @@ bool CgEngine::init(int argc, char* argv[])
 
     // Create the window with a specific title:   
     windowId = glutCreateWindow("3D Switzerland Visualization");
+
+    // Init Glew (*after* the context creation):
+    glewExperimental = GL_TRUE;
+    glewInit();
+
+    // OpenGL 2.1 is required:
+    if (!glewIsSupported("GL_VERSION_2_1"))
+    {
+        std::cout << "OpenGL 2.1 not supported" << std::endl;
+        return 0;
+    }
 
     // The OpenGL context is now initialized...
     glEnable(GL_DEPTH_TEST);
