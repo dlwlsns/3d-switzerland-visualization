@@ -80,20 +80,18 @@ void Mesh::render(glm::mat4 inverseCamera) {
     // Pass a triangle (object coordinates: the triangle is centered around the origin):
     glLoadMatrixf(glm::value_ptr(inverseCamera));
     glDepthFunc(GL_LESS);
-
     glBindVertexArray(vaoGlobal);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glColor3f(1.0f, 1.0f, 1.0f);
     glDrawElements(GL_TRIANGLES, faces.size() * 3, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 
-    glDisable(GL_DEPTH_TEST);
     glBindVertexArray(vaoGlobal);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glLineWidth(1.0f);
     glColor3f(0.0f, 0.0f, 0.0f);
     glDrawElements(GL_TRIANGLES, faces.size() * 3, GL_UNSIGNED_INT, nullptr);
-    glEnable(GL_DEPTH_TEST);
-
+    glClear(GL_DEPTH_BUFFER_BIT);
     // unbind the vertex array object
     glBindVertexArray(0);
 }
