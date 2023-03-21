@@ -17,6 +17,9 @@ void Mesh::addVertex(glm::vec3 vertex) {
 std::vector<glm::vec3> Mesh::getVertecies() {
     return verticies;
 }
+std::vector<unsigned int> Mesh::getFaces() {
+    return faces;
+}
 
 void Mesh::addFace(unsigned int face[3]) {
     this->faces.push_back(face[0]);
@@ -50,9 +53,9 @@ void Mesh::initVAO()
 
 void Mesh::triangle(int v0, int v1, int v2)
 {
-    glVertex3f(verticies[v0].x, verticies[v0].y, verticies[v0].z);
-    glVertex3f(verticies[v1].x, verticies[v1].y, verticies[v1].z);
-    glVertex3f(verticies[v2].x, verticies[v2].y, verticies[v2].z);
+    //glVertex3f(verticies[v0].x, verticies[v0].y, verticies[v0].z);
+    //glVertex3f(verticies[v1].x, verticies[v1].y, verticies[v1].z);
+    //glVertex3f(verticies[v2].x, verticies[v2].y, verticies[v2].z);
     /*
     glBegin(GL_TRIANGLES);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);

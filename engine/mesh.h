@@ -18,6 +18,7 @@ class LIB_API Mesh : public Node
 		void addVertex(glm::vec3 vertex);
 		std::vector<glm::vec3> getVertecies();
 		void addFace(unsigned int face[3]);
+		std::vector<unsigned int> getFaces();
 
 		void initVAO();
 

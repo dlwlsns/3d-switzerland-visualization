@@ -11,6 +11,10 @@
 // C/C++:
 #include <iostream>
 #include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <chrono>
 
 CgEngine* engine;
 Node* scene;
@@ -23,6 +27,10 @@ glm::vec3 cameraFront = glm::vec3(500.0f, 400.0f, 500.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, -1.0f, 0.0f);
 glm::vec3 direction;
 float yaw, pitch = 0;
+
+bool generateObjFile = true;
+std::string vectors = "";
+std::string faces = "";
 
 
 Node* search(Node* node, char* name) {
@@ -147,13 +155,21 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
         }
     }
 
+    for (int y = 0; y < size - 1; y++) {
+        for (int x = 1; x < size - 1; x++) {
+            face(y * tesselation + x, (y + 1) * tesselation + x, y * tesselation + x + 1);
+            face((y + 1) * tesselation + x, (y + 1) * tesselation + x + 1, y * tesselation + x + 1);
+        }
+    }
+
+
     // Generate all triangles
     for (int i = 0; i < verticies.size(); i++) {
         if (i < verticies.size() - tesselation) {
-            if (i % tesselation < tesselation - 1) {
-                face(i, i + tesselation, i + 1);
-                face(i + tesselation, i + tesselation + 1, i+1);
-            }
+            //if (i % tesselation < tesselation - 1) {
+                //face(i, i + tesselation, i + 1);
+                //face(i + tesselation, i + tesselation + 1, i+1);
+            //}
         }
     }
 
@@ -161,6 +177,37 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
 
     plane->initVAO();
     return plane;
+}
+
+void generateObj(Mesh* mesh) {
+    auto now = std::chrono::system_clock::now();
+    auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+    std::ofstream objfile("./files/swissland_" + std::to_string(UTC) + ".obj");
+
+
+    for (auto v : mesh->getVertecies()) {
+        objfile << "v " + std::to_string(v.x) + " " + std::to_string(v.y) + " " + std::to_string(v.z) + "\n";
+    }
+    
+    int i = 0;
+    for (auto f : mesh->getFaces()) {
+        switch (i) {
+        case 0:
+            objfile << "f " + std::to_string(f);
+            i++;
+            break;
+        case 1:
+            objfile << " " + std::to_string(f) + " ";
+            i++;
+            break;
+        case 2:
+            objfile << std::to_string(f) + "\n";
+            i = 0;
+            break;
+        }
+    }
+
+    objfile.close();
 }
 
 //////////
@@ -217,7 +264,12 @@ int main(int argc, char* argv[]) {
     scene = new Node("[root]");
 
     //TODO: problem with some numbers crashing drawGrid (tesselation examples 550, 700)
-    scene->addChild(drawGrid(2000.0f, 2000.0f, rasterBandData, min));
+    Mesh* land_mesh = drawGrid(2000.0f, 2000.0f, rasterBandData, min);
+    scene->addChild(land_mesh);
+
+    if (generateObjFile) {
+        generateObj(land_mesh);
+    }
 
     // Add cameras to the scene
     staticCam = new PerspectiveCamera("camera", 1.0f, 3000.0f, 45.0f, 1.0f);
