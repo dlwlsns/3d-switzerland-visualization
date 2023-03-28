@@ -13,6 +13,7 @@
 
 // FreeGLUT:   
 #include <GL/freeglut.h>
+//#include <GLFW/glfw3.h>
 
 // Engine
 #include "cg_engine.h"
@@ -136,6 +137,14 @@ bool CgEngine::free()
         std::cout << "ERROR: class not initialized" << std::endl;
         return false;
     }
+
+    delete currentScene;
+
+    while (!cameras.empty()) {
+        cameras.pop_back();
+    }
+
+    delete renderlist;
 
     // Done:
     initFlag = false;

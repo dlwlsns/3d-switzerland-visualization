@@ -1,6 +1,7 @@
 #include <iostream>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
+#include <GLFW/glfw3.h>
+#include <algorithm>
 
 #include "mesh.h"
 
@@ -10,22 +11,24 @@ Mesh::~Mesh() {
     std::cout << "Deleted mesh" << std::endl;
 }
 
-void Mesh::addVertex(glm::vec3 vertex) {
-    this->verticies.push_back(vertex);
+void Mesh::addVerticies(std::vector<Vertex*> verticies) {
+    for (int i = 0; i < verticies.size(); i++) {
+        this->verticies.push_back(verticies[i]->point);
+    }
 }
 
-std::vector<glm::vec3> Mesh::getVertecies() {
-    return verticies;
-}
-
-void Mesh::addFace(unsigned int face[3]) {
-    this->faces.push_back(face[0]);
-    this->faces.push_back(face[1]);
-    this->faces.push_back(face[2]);
+void Mesh::addFaces(std::vector<Face*> faces) {
+    for (int i = 0; i < faces.size(); i++) {
+        this->faces.push_back(faces[i]->edge->start->id);
+        this->faces.push_back(faces[i]->edge->end->id);
+        this->faces.push_back(faces[i]->edge->next->end->id);
+    }
 }
 
 void Mesh::initVAO()
 {
+    std::cout << "n verticies: " << verticies.size() << "n faces: " << faces.size() / 3 << std::endl;
+
     glGenVertexArrays(1, &vaoGlobal);
     glBindVertexArray(vaoGlobal);
 
@@ -46,34 +49,6 @@ void Mesh::initVAO()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboFace);
 
     glBindVertexArray(0);
-}
-
-void Mesh::triangle(int v0, int v1, int v2)
-{
-    glVertex3f(verticies[v0].x, verticies[v0].y, verticies[v0].z);
-    glVertex3f(verticies[v1].x, verticies[v1].y, verticies[v1].z);
-    glVertex3f(verticies[v2].x, verticies[v2].y, verticies[v2].z);
-    /*
-    glBegin(GL_TRIANGLES);
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        glVertex3f(verticies[v0].x, verticies[v0].y, verticies[v0].z);
-
-        glVertex3f(verticies[v1].x, verticies[v1].y, verticies[v1].z);
-
-        glVertex3f(verticies[v2].x, verticies[v2].y, verticies[v2].z);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-        glVertex3f(verticies[v0].x, verticies[v0].y, verticies[v0].z);
-        glVertex3f(verticies[v1].x, verticies[v1].y, verticies[v1].z);
-
-        glVertex3f(verticies[v0].x, verticies[v0].y, verticies[v0].z);
-        glVertex3f(verticies[v2].x, verticies[v2].y, verticies[v2].z);
-
-        glVertex3f(verticies[v2].x, verticies[v2].y, verticies[v2].z);
-        glVertex3f(verticies[v1].x, verticies[v1].y, verticies[v1].z);
-    glEnd();*/
 }
 
 void Mesh::render(glm::mat4 inverseCamera) {

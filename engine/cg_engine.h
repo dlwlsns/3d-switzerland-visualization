@@ -28,6 +28,7 @@
 #include "mesh.h"
 #include "perspectiveCamera.h"
 #include "orthographicCamera.h"
+#include "chunk.h"
 
 
 /////////////

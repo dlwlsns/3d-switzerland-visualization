@@ -1,5 +1,10 @@
 #pragma once
+
+#include <vector>
+
 #include "node.h"
+#include "face.h"
+#include "vertex.h"
 
 class LIB_API Mesh : public Node
 {
@@ -9,15 +14,12 @@ class LIB_API Mesh : public Node
 		unsigned int vboFace;
 		std::vector<glm::vec3> verticies;
 		std::vector<unsigned int> faces;
-
-		void triangle(int v0, int v1, int v2);
 	public:
 		Mesh(char* name);
 		virtual ~Mesh();
 
-		void addVertex(glm::vec3 vertex);
-		std::vector<glm::vec3> getVertecies();
-		void addFace(unsigned int face[3]);
+		void addVerticies(std::vector<Vertex*> verticies);
+		void addFaces(std::vector<Face*> faces);
 
 		void initVAO();
 

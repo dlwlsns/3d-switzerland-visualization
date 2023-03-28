@@ -1,7 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <glm/gtx/string_cast.hpp>
-#include <GL/freeglut.h>
+#include <GLFW/glfw3.h>
 
 #include "renderList.h"
 #include "mesh.h"
