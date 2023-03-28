@@ -1,6 +1,7 @@
 #include <iostream>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
+#include <GLFW/glfw3.h>
+#include <algorithm>
 
 #include "mesh.h"
 
@@ -11,33 +12,57 @@ Mesh::~Mesh() {
 }
 
 void Mesh::addVertex(glm::vec3 vertex) {
-    this->verticies.push_back(vertex);
+    this->verticies.push_back(new Vertex(vertex));
 }
 
-std::vector<glm::vec3> Mesh::getVertecies() {
+std::vector<Vertex *> Mesh::getVertecies() {
     return verticies;
 }
 
-void Mesh::addFace(unsigned int face[3]) {
-    this->faces.push_back(face[0]);
-    this->faces.push_back(face[1]);
-    this->faces.push_back(face[2]);
+void Mesh::addEdge(Vertex* start, Vertex* end) {
+    this->edges.push_back(new Edge(start, end));
+}
+
+void Mesh::addFace(int v0, int v1, int v2) {
+    addEdge(this->verticies[v0], this->verticies[v1]);
+    addEdge(this->verticies[v1], this->verticies[v2]);
+    addEdge(this->verticies[v2], this->verticies[v0]);
+
+    this->edges.end()[-3]->next = this->edges.end()[-2];
+    this->edges.end()[-2]->next = this->edges.end()[-1];
+    this->edges.end()[-1]->next = this->edges.end()[-3];
+
+    this->faces.push_back(new Face(this->edges.end()[-2]));
 }
 
 void Mesh::initVAO()
 {
+    //Adding all verticies from a chunk
+    for (int i = 0; i < verticies.size(); i++) {
+        v.push_back(verticies[i]->point);
+    }
+
+    //Adding all faces from a chunk
+    for (int i = 0; i < faces.size(); i++) {
+        f.push_back(faces[i]->edge->start->id);
+        f.push_back(faces[i]->edge->end->id);
+        f.push_back(faces[i]->edge->next->end->id);
+    }
+
+    std::cout << "n verticies: " << v.size() << "n faces: " << f.size() / 3 << std::endl;
+
     glGenVertexArrays(1, &vaoGlobal);
     glBindVertexArray(vaoGlobal);
 
-    unsigned int N = verticies.size();
+    unsigned int N = v.size();
 
     glGenBuffers(1, &vboVertex);
     glBindBuffer(GL_ARRAY_BUFFER, vboVertex);
-    glBufferData(GL_ARRAY_BUFFER, N * sizeof(glm::vec3), &verticies[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, N * sizeof(glm::vec3), &v[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &vboFace);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboFace);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, faces.size() * sizeof(unsigned int), &faces[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, f.size() * sizeof(unsigned int), &f[0], GL_STATIC_DRAW);
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
@@ -46,34 +71,6 @@ void Mesh::initVAO()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboFace);
 
     glBindVertexArray(0);
-}
-
-void Mesh::triangle(int v0, int v1, int v2)
-{
-    glVertex3f(verticies[v0].x, verticies[v0].y, verticies[v0].z);
-    glVertex3f(verticies[v1].x, verticies[v1].y, verticies[v1].z);
-    glVertex3f(verticies[v2].x, verticies[v2].y, verticies[v2].z);
-    /*
-    glBegin(GL_TRIANGLES);
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        glVertex3f(verticies[v0].x, verticies[v0].y, verticies[v0].z);
-
-        glVertex3f(verticies[v1].x, verticies[v1].y, verticies[v1].z);
-
-        glVertex3f(verticies[v2].x, verticies[v2].y, verticies[v2].z);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-        glVertex3f(verticies[v0].x, verticies[v0].y, verticies[v0].z);
-        glVertex3f(verticies[v1].x, verticies[v1].y, verticies[v1].z);
-
-        glVertex3f(verticies[v0].x, verticies[v0].y, verticies[v0].z);
-        glVertex3f(verticies[v2].x, verticies[v2].y, verticies[v2].z);
-
-        glVertex3f(verticies[v2].x, verticies[v2].y, verticies[v2].z);
-        glVertex3f(verticies[v1].x, verticies[v1].y, verticies[v1].z);
-    glEnd();*/
 }
 
 void Mesh::render(glm::mat4 inverseCamera) {

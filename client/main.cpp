@@ -106,16 +106,6 @@ void specialCallback(int key, int mouseX, int mouseY)
 Mesh* plane = new Mesh("plane");
 std::vector<glm::vec3> verticies;
 
-void face(int v0, int v1, int v2) {
-    unsigned int face[3] = { v0, v1, v2 };
-
-    //glm::vec3 n1 = verticies[v1] - verticies[v0];
-    //glm::vec3 n2 = verticies[v1] - verticies[v2];
-    //glm::vec3 n = glm::normalize(glm::cross(n1, n2));
-
-    plane->addFace(face);
-}
-
 Mesh* drawGrid(float size, int tesselation, float** heights, float min)
 {
     // Compute starting coordinates and step size:
@@ -148,16 +138,12 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
     }
 
     // Generate all triangles
-    for (int i = 0; i < verticies.size(); i++) {
-        if (i < verticies.size() - tesselation) {
-            if (i % tesselation < tesselation - 1) {
-                face(i, i + tesselation, i + 1);
-                face(i + tesselation, i + tesselation + 1, i+1);
-            }
+    for (int i = 0; i < verticies.size() - tesselation; i++) {
+        if (i % tesselation < tesselation - 1) {
+            plane->addFace(i, i + tesselation, i + 1);
+            plane->addFace(i + tesselation, i + tesselation + 1, i + 1);
         }
     }
-
-    std::cout << "verticies count: " << verticies.size() << std::endl;
 
     plane->initVAO();
     return plane;
