@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="cg_engine.cpp" />
+    <ClCompile Include="chunk.cpp" />
     <ClCompile Include="edge.cpp" />
     <ClCompile Include="face.cpp" />
     <ClCompile Include="mesh.cpp" />
@@ -108,6 +109,7 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="cg_engine.h" />
+    <ClInclude Include="chunk.h" />
     <ClInclude Include="edge.h" />
     <ClInclude Include="face.h" />
     <ClInclude Include="mesh.h" />

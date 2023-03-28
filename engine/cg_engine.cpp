@@ -138,6 +138,14 @@ bool CgEngine::free()
         return false;
     }
 
+    delete currentScene;
+
+    while (!cameras.empty()) {
+        cameras.pop_back();
+    }
+
+    delete renderlist;
+
     // Done:
     initFlag = false;
     return true;

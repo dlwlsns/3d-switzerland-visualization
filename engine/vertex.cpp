@@ -11,5 +11,5 @@ Vertex::Vertex(glm::vec3 point) {
 }
 
 Vertex::~Vertex() {
-
+	
 }
