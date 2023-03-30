@@ -126,6 +126,11 @@ void face(int v0, int v1, int v2) {
 
 Mesh* drawGrid(float size, int tesselation, float** heights, float min)
 {
+    if (size <= 0.0f || tesselation <= 0 || heights == nullptr) {
+        std::cerr << "Invalid input parameters" << std::endl;
+        return nullptr;
+    }
+
     std::cout << "Drawing Grid" << std::endl;
     std::cout << "Size: " << size << std::endl;
     std::cout << "Tesselation: " << tesselation << std::endl;
@@ -142,10 +147,10 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
     int x = 0;
     int y = 0;
 
+
     while (curZ < end) {
         verticies.push_back(glm::vec3(curX, heights[x][y], curZ));
         plane->addVertex(verticies.back());
-        
 
         curX += triangleSize;
         x++;
@@ -158,6 +163,7 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
             x = 0;
         }
     }
+    
     int face_counter = 0;
     for (int y = 0; y < size - 1; y++) {
         for (int x = 0; x < size - 1; x++) {
@@ -175,108 +181,34 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
     return plane;
 }
 
-Mesh* drawGrid2(float size, int tesselation, float** heights, float min) {
-    if (size <= 0.0f || tesselation <= 0 || heights == nullptr) {
-        std::cerr << "Invalid input parameters" << std::endl;
-        return nullptr;
-    }
-
-    // Compute starting coordinates and step size:
-    float start = -size / 2.0f;
-    float end = size / 2.0f;
-    float triangleSize = size / (float)tesselation;
-
-    // Generate all vertices
-    float curZ = start;
-    int y = 0;
-    for (int j = 0; j < tesselation; j++) {
-        float curX = start;
-        int x = 0;
-        for (int i = 0; i < tesselation; i++) {
-            float height = heights[x][y];
-            //if (height < min) height = min; // clamp minimum height
-            verticies.push_back(glm::vec3(curX, height, curZ));
-            plane->addVertex(verticies.back());
-            curX += triangleSize;
-            x++;
-        }
-        curZ += triangleSize;
-        y++;
-    }
-
-    // Generate all faces
-    for (int j = 0; j < tesselation; j++) {
-        for (int i = 0; i < tesselation; i++) {
-            int index = j * (tesselation + 1) + i;
-            face(index, index + tesselation + 1, index + 1);
-            face(index + 1, index + tesselation + 1, index + tesselation + 2);
-        }
-    }
-
-    // Create mesh object
-    plane->initVAO();
-    return plane;
-}
-
-
 void generateObj(Mesh* mesh) {
     auto now = std::chrono::system_clock::now();
     auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
     std::ofstream objfile("./files/swissland_" + std::to_string(UTC) + ".obj");
 
-    std::ofstream debugfile("./files/debug_" + std::to_string(UTC) + ".txt");
-
-
     for (auto v : mesh->getVertecies()) {
         objfile << "v " + std::to_string(v.x) + " " + std::to_string(v.y) + " " + std::to_string(v.z) + "\n";
     }
     
-    std::vector<int> faces_debug_counter(mesh->getVertecies().size());
-
-    long long min = 1000000000;
-    long long max = -1;
     int i = 0;
     for (auto f : mesh->getFaces()) {
+        f = f + 1;
         switch (i) {
         case 0:
             objfile << "f " + std::to_string(f);
-            faces_debug_counter[f] += 1;
-            if (min > f)
-                min = f;
-            if (max < f)
-                max = f;
             i++;
             break;
         case 1:
             objfile << " " + std::to_string(f) + " ";
-            faces_debug_counter[f] += 1;
-            if (min > f)
-                min = f;
-            if (max < f)
-                max = f;
             i++;
             break;
         case 2:
             objfile << std::to_string(f) + "\n";
-            faces_debug_counter[f] += 1;
-            if (min > f)
-                min = f;
-            if (max < f)
-                max = f;
             i = 0;
             break;
         }
     }
 
-    std::cout << "Min-Max: " << min << "-" << max << std::endl;
-
-    int counter = 0;
-    for (auto j : faces_debug_counter) {
-        debugfile << counter << ": " << j << "\n";
-        counter++;
-    }
-
-    debugfile.close();
     objfile.close();
 }
 
