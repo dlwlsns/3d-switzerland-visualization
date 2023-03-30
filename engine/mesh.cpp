@@ -17,6 +17,10 @@ void Mesh::addVerticies(std::vector<Vertex*> verticies) {
     }
 }
 
+std::vector<glm::vec3> Mesh::getVerticies() {
+    return verticies;
+}
+
 void Mesh::addFaces(std::vector<Face*> faces) {
     for (int i = 0; i < faces.size(); i++) {
         this->faces.push_back(faces[i]->edge->start->id);

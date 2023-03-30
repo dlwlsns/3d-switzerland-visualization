@@ -185,7 +185,7 @@ void generateObj(Mesh* mesh) {
     auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
     std::ofstream objfile("./files/swissland_" + std::to_string(UTC) + ".obj");
 
-    for (auto v : mesh->getVertecies()) {
+    for (auto v : mesh->getVerticies()) {
         objfile << "v " + std::to_string(v.x) + " " + std::to_string(v.y) + " " + std::to_string(v.z) + "\n";
     }
     
@@ -269,6 +269,7 @@ int main(int argc, char* argv[]) {
 
     if (generateObjFile) {
         generateObj(land_mesh);
+        cout << "Generated OBJ file" << endl;
     }
 
     // Add cameras to the scene
@@ -278,6 +279,8 @@ int main(int argc, char* argv[]) {
     staticCam->setObjectCoordinates(s_camera_M);
 
     scene->addChild(staticCam);
+
+    cout << "Added camera" << endl;
 
     // Parse selected scene and run
     engine->parse(scene);
