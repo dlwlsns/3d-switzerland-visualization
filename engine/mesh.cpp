@@ -24,6 +24,9 @@ void Mesh::addFaces(std::vector<Face*> faces) {
         this->faces.push_back(faces[i]->edge->next->end->id);
     }
 }
+std::vector<unsigned int> Mesh::getFaces() {
+    return faces;
+}
 
 void Mesh::initVAO()
 {
