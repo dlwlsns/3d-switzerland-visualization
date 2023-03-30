@@ -134,32 +134,15 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
     std::cout << "Triangle size: " << triangleSize << std::endl;
 
     // Generate all verticies
-    float curZ = start;
-    float curX = start;
-
-    int x = 0;
-    int y = 0;
-
     cout << "Generating verticies..." << endl;
-
-    while (curZ < end) {
-        chunk->addVertex(glm::vec3(curX, heights[x][y], curZ));
-        
-        curX += triangleSize;
-        x++;
-
-        if (curX >= end) {
-            curZ += triangleSize;
-            curX = start;
-
-            y++;
-            x = 0;
+    for (int z = 0; z < size; z++) {
+        for (int x = 0; x < size; x++) {
+            chunk->addVertex(glm::vec3(x * triangleSize, heights[z][x], z * triangleSize));
         }
     }
 
-    cout << "Generating faces..." << endl;
-
     // Generate all triangles
+    cout << "Generating faces..." << endl;
     for (int y = 0; y < tesselation -1 ; y++) {
         for (int x = 0; x < tesselation - 1; x++) {
             chunk->addFace(y * tesselation + x, (y + 1) * tesselation + x, y * tesselation + x +1);
