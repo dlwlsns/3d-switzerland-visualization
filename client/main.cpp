@@ -115,7 +115,7 @@ void specialCallback(int key, int mouseX, int mouseY)
 }
 
 Mesh* plane = new Mesh("plane");
-Chunk* chunk = new Chunk("chunk");
+Chunk* chunk = new Chunk(1, 0);
 
 Mesh* drawGrid(float size, int tesselation, float** heights, float min)
 {
@@ -128,13 +128,12 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
     std::cout << "Size: " << size << std::endl;
     std::cout << "Tesselation: " << tesselation << std::endl;
     // Compute starting coordinates and step size:
-    float start = -size / 2.0f;
-    float end = size / 2.0f;
     float triangleSize = size / (float)tesselation;
     std::cout << "Triangle size: " << triangleSize << std::endl;
 
     // Generate all verticies
     cout << "Generating verticies..." << endl;
+    chunk->verticies.reserve(size * size);
     for (int z = 0; z < size; z++) {
         for (int x = 0; x < size; x++) {
             chunk->addVertex(glm::vec3(x * triangleSize, heights[z][x], z * triangleSize));
@@ -143,8 +142,9 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
 
     // Generate all triangles
     cout << "Generating faces..." << endl;
-    for (int y = 0; y < tesselation -1 ; y++) {
-        for (int x = 0; x < tesselation - 1; x++) {
+    chunk->faces.reserve((size - 1) * (size - 1) * 2);
+    for (int y = 0; y < size - 1 ; y++) {
+        for (int x = 0; x < size - 1; x++) {
             chunk->addFace(y * tesselation + x, (y + 1) * tesselation + x, y * tesselation + x +1);
             chunk->addFace((y+ 1) * tesselation + x, (y+1) * tesselation + x + 1, y * tesselation + x + 1);
         }
@@ -159,7 +159,7 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
     delete chunk;
 
     cout << "Init VAO..." << endl;
-    plane->initVAO();
+    
     return plane;
 }
 
@@ -168,8 +168,10 @@ void generateObj(Mesh* mesh) {
     auto UTC = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
     std::ofstream objfile("./files/swissland_" + std::to_string(UTC) + ".obj");
 
+    std::string text("");
+
     for (auto v : mesh->getVerticies()) {
-        objfile << "v " + std::to_string(v.x) + " " + std::to_string(v.y) + " " + std::to_string(v.z) + "\n";
+        text + "v " + std::to_string(v.x) + " " + std::to_string(v.y) + " " + std::to_string(v.z) + "\n";
     }
     
     int i = 0;
@@ -177,19 +179,21 @@ void generateObj(Mesh* mesh) {
         f = f + 1;
         switch (i) {
         case 0:
-            objfile << "f " + std::to_string(f);
+            text.append("f ").append(std::to_string(f));
             i++;
             break;
         case 1:
-            objfile << " " + std::to_string(f) + " ";
+            text.append(" ").append(std::to_string(f)).append(" ");
             i++;
             break;
         case 2:
-            objfile << std::to_string(f) + "\n";
+            text.append(std::to_string(f)).append("\n");
             i = 0;
             break;
         }
     }
+
+    objfile << text;
 
     objfile.close();
 }
@@ -246,6 +250,7 @@ int main(int argc, char* argv[]) {
 
     //TODO: problem with some numbers crashing drawGrid (tesselation examples 550, 700)
     Mesh* land_mesh = drawGrid(2000.0f, 2000.0f, rasterBandData, min);
+    plane->initVAO();
     scene->addChild(land_mesh);
 
     delete rasterBandData;

@@ -12,6 +12,7 @@ Mesh::~Mesh() {
 }
 
 void Mesh::addVerticies(std::vector<Vertex*> verticies) {
+    this->verticies.reserve(verticies.size());
     for (int i = 0; i < verticies.size(); i++) {
         this->verticies.push_back(verticies[i]->point);
     }
@@ -22,6 +23,7 @@ std::vector<glm::vec3> Mesh::getVerticies() {
 }
 
 void Mesh::addFaces(std::vector<Face*> faces) {
+    this->faces.reserve(faces.size());
     for (int i = 0; i < faces.size(); i++) {
         this->faces.push_back(faces[i]->edge->start->id);
         this->faces.push_back(faces[i]->edge->end->id);

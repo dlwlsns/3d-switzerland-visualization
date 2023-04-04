@@ -20,11 +20,14 @@
 class LIB_API Chunk
 {
 private:
+	
+public:
 	std::vector<Vertex*> verticies;
 	std::vector<Edge*> edges;
 	std::vector<Face*> faces;
-public:
-	Chunk(char* name);
+	int x, z;
+
+	Chunk(int x, int z);
 	virtual ~Chunk();
 
 	void addVertex(glm::vec3 vertex);

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <algorithm>
 
-Chunk::Chunk(char* name) {}
+Chunk::Chunk(int x, int z) : x(x), z(z) {}
 
 Chunk::~Chunk() {
     while (!verticies.empty()) {
@@ -25,6 +25,8 @@ Chunk::~Chunk() {
 }
 
 void Chunk::addVertex(glm::vec3 vertex) {
+    vertex.x += x * 1000;
+    vertex.z += z * 1000;
     this->verticies.push_back(new Vertex(vertex));
 }
 
