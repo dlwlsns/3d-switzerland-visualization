@@ -31,10 +31,7 @@ glm::vec3 cameraUp = glm::vec3(0.0f, -1.0f, 0.0f);
 glm::vec3 direction;
 float yaw, pitch = 0;
 
-bool generateObjFile = true;
-std::string vectors = "";
-std::string faces = "";
-
+bool generateObjFile = false;
 
 Node* search(Node* node, char* name) {
     if (strcmp(node->getName(), name) == 0) {
@@ -115,14 +112,35 @@ void specialCallback(int key, int mouseX, int mouseY)
 }
 
 Mesh* plane = new Mesh("plane");
-Chunk* chunk = new Chunk(1, 0);
 
-Mesh* drawGrid(float size, int tesselation, float** heights, float min)
+float** readTiff(const char* path) {
+    // create object of Geotiff class
+    Geotiff* tiff = new Geotiff(path);
+
+    cout << tiff->GetFileName() << endl;
+
+    // dump out Geotiff band NoData value (often it is -9999.0)
+    //cout << "No data value: " << tiff->GetNoDataValue() << endl;
+
+    // dump out array (band) dimensions of Geotiff data  
+    int* dims = tiff->GetDimensions();
+    cout << dims[0] << " " << dims[1] << " " << dims[2] << endl;
+
+    // output a value from 2D array  
+    float** rasterBandData = tiff->GetRasterBand(1);
+
+    delete tiff;
+
+    return rasterBandData;
+}
+
+Chunk* generateChunk(float size, int tesselation, float** heights, int x, int z)
 {
     if (size <= 0.0f || tesselation <= 0 || heights == nullptr) {
         std::cerr << "Invalid input parameters" << std::endl;
         return nullptr;
     }
+    Chunk* chunk = new Chunk(x, z);
 
     std::cout << "Drawing Grid" << std::endl;
     std::cout << "Size: " << size << std::endl;
@@ -149,18 +167,8 @@ Mesh* drawGrid(float size, int tesselation, float** heights, float min)
             chunk->addFace((y+ 1) * tesselation + x, (y+1) * tesselation + x + 1, y * tesselation + x + 1);
         }
     }
-
-    cout << "Loading verticies..." << endl;
-    plane->addVerticies(chunk->getVertecies());
-
-    cout << "Loading faces..." << endl;
-    plane->addFaces(chunk->getFaces());
-
-    delete chunk;
-
-    cout << "Init VAO..." << endl;
     
-    return plane;
+    return chunk;
 }
 
 void generateObj(Mesh* mesh) {
@@ -205,38 +213,6 @@ void generateObj(Mesh* mesh) {
 
 using namespace std;
 int main(int argc, char* argv[]) {
-    // create object of Geotiff class
-    Geotiff* tiff = new Geotiff((const char*)"../swissalti3d_2022_2709-1119_0.5_2056_5728.tif");
-
-    cout << tiff->GetFileName() << endl;
-
-    // dump out Geotiff band NoData value (often it is -9999.0)
-    //cout << "No data value: " << tiff->GetNoDataValue() << endl;
-
-    // dump out array (band) dimensions of Geotiff data  
-    int* dims = tiff->GetDimensions();
-    cout << dims[0] << " " << dims[1] << " " << dims[2] << endl;
-
-    // output a value from 2D array  
-    float** rasterBandData = tiff->GetRasterBand(1);
-
-    float min = 1000;
-    float max = 0;
-    for (int y = 0; y < dims[1]; y++) {
-        for (int x = 0; x < dims[0]; x++) {
-            if (rasterBandData[x][y] < min)
-                min = rasterBandData[x][y];
-
-            if (rasterBandData[x][y] > max)
-                max = rasterBandData[x][y];
-            //cout << "value at row " << x << ", column " << y << ": " << rasterBandData[x][y] << endl;
-        }
-    }
-
-    cout << min << " " << max << endl;
-    delete tiff;
-    
-
     // Init and use the lib:
     CgEngine* engine = CgEngine::getIstance();
     engine->init(argc, argv);
@@ -247,22 +223,48 @@ int main(int argc, char* argv[]) {
 
     // Load scene
     scene = new Node("[root]");
+    scene->addChild(plane);
 
-    //TODO: problem with some numbers crashing drawGrid (tesselation examples 550, 700)
-    Mesh* land_mesh = drawGrid(2000.0f, 2000.0f, rasterBandData, min);
-    plane->initVAO();
-    scene->addChild(land_mesh);
-
+    float** rasterBandData = readTiff("../swissalti3d_2022_2709-1119_0.5_2056_5728.tif");
+    Chunk* chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, 0);
     delete rasterBandData;
+    plane->addChunk(chunk);
+    delete chunk;
+
+    rasterBandData = readTiff("../swissalti3d_2022_2709-1118_0.5_2056_5728.tif");
+    chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, 1);
+    delete rasterBandData;
+    plane->addChunk(chunk);
+    delete chunk;
+
+    rasterBandData = readTiff("../swissalti3d_2022_2709-1120_0.5_2056_5728.tif");
+    chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, -1);
+    delete rasterBandData;
+    plane->addChunk(chunk);
+    delete chunk;
+
+    rasterBandData = readTiff("../swissalti3d_2022_2710-1119_0.5_2056_5728.tif");
+    chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 1, 0);
+    delete rasterBandData;
+    plane->addChunk(chunk);
+    delete chunk;
+
+    rasterBandData = readTiff("../swissalti3d_2022_2708-1119_0.5_2056_5728.tif");
+    chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, -1, 0);
+    delete rasterBandData;
+    plane->addChunk(chunk);
+    delete chunk;
+
+    plane->initVAO();
 
     if (generateObjFile) {
-        generateObj(land_mesh);
+        generateObj(plane);
         cout << "Generated OBJ file" << endl;
     }
 
     // Add cameras to the scene
     staticCam = new PerspectiveCamera("camera", 1.0f, 3000.0f, 45.0f, 1.0f);
-    glm::mat4 s_camera_M = glm::translate(glm::mat4(1.0f), glm::vec3(200.0f, 600.0f, -500.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(240.0f), glm::vec3(0.0f, 1.0f, 0.0f));//* glm::rotate(glm::mat4(1.0f), glm::radians(-2.0f), glm::vec3(1.0f, 0.0f, 1.0f)) )
+    glm::mat4 s_camera_M = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 600.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(240.0f), glm::vec3(0.0f, 1.0f, 0.0f));//* glm::rotate(glm::mat4(1.0f), glm::radians(-2.0f), glm::vec3(1.0f, 0.0f, 1.0f)) )
     //glm::mat4 s_camera_M = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     staticCam->setObjectCoordinates(s_camera_M);
 

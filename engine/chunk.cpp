@@ -25,8 +25,8 @@ Chunk::~Chunk() {
 }
 
 void Chunk::addVertex(glm::vec3 vertex) {
-    vertex.x += x * 1000;
-    vertex.z += z * 1000;
+    vertex.x += (x * 2000);
+    vertex.z += (z * 2000);
     this->verticies.push_back(new Vertex(vertex));
 }
 

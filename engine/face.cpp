@@ -16,9 +16,3 @@ Face::Face(Edge* edge) {
 Face::~Face() {
 	//delete edge;
 }
-
-void Face::draw() {
-	glVertex3f(edge->start->point.x, edge->start->point.y, edge->start->point.z);
-	glVertex3f(edge->end->point.x, edge->end->point.y, edge->end->point.z);
-	glVertex3f(edge->next->end->point.x, edge->next->end->point.y, edge->next->end->point.z);
-}

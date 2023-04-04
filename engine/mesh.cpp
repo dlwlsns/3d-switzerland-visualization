@@ -11,11 +11,23 @@ Mesh::~Mesh() {
     std::cout << "Deleted mesh" << std::endl;
 }
 
+void Mesh::addChunk(Chunk* chunk) {
+    std::cout << "Loading verticies..." << std::endl;
+    addVerticies(chunk->getVertecies());
+    std::cout << "Loading faces..." << std::endl;
+    addFaces(chunk->getFaces());
+}
+
 void Mesh::addVerticies(std::vector<Vertex*> verticies) {
-    this->verticies.reserve(verticies.size());
+    unsigned int newId = this->verticies.size();
+
     for (int i = 0; i < verticies.size(); i++) {
+        verticies[i]->id = newId;
         this->verticies.push_back(verticies[i]->point);
+        newId++;
     }
+
+    std::cout << "Total verticies loaded: " << this->verticies.size() << std::endl;
 }
 
 std::vector<glm::vec3> Mesh::getVerticies() {
@@ -23,12 +35,13 @@ std::vector<glm::vec3> Mesh::getVerticies() {
 }
 
 void Mesh::addFaces(std::vector<Face*> faces) {
-    this->faces.reserve(faces.size());
     for (int i = 0; i < faces.size(); i++) {
         this->faces.push_back(faces[i]->edge->start->id);
         this->faces.push_back(faces[i]->edge->end->id);
         this->faces.push_back(faces[i]->edge->next->end->id);
     }
+
+    std::cout << "Total faces loaded: " << this->faces.size()/3 << std::endl;
 }
 std::vector<unsigned int> Mesh::getFaces() {
     return faces;
@@ -36,7 +49,8 @@ std::vector<unsigned int> Mesh::getFaces() {
 
 void Mesh::initVAO()
 {
-    std::cout << "n verticies: " << verticies.size() << "n faces: " << faces.size() / 3 << std::endl;
+    std::cout << "VAO Total faces loaded: " << this->faces.size() / 3 << std::endl;
+    std::cout << "VAO Total verticies loaded: " << this->verticies.size() << std::endl;
 
     glGenVertexArrays(1, &vaoGlobal);
     glBindVertexArray(vaoGlobal);
