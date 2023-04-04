@@ -171,7 +171,7 @@ void generateObj(Mesh* mesh) {
     std::string text("");
 
     for (auto v : mesh->getVerticies()) {
-        text + "v " + std::to_string(v.x) + " " + std::to_string(v.y) + " " + std::to_string(v.z) + "\n";
+        text.append("v ").append(std::to_string(v.x)).append(" ").append(std::to_string(v.y)).append(" ").append(std::to_string(v.z)).append("\n");
     }
     
     int i = 0;
