@@ -18,6 +18,21 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <iomanip>
+#include "FileDownloader.h"
+
+#include <string>
+#include <iostream>
+#include <filesystem>
+#include <vector>
+#include <thread>
+#include <mutex>
+#include <chrono>
+#include <curlpp/cURLpp.hpp>
+#include <curlpp/Easy.hpp>
+#include <curlpp/Options.hpp>
+#include "json/json.h"
+#include <fstream>
 
 CgEngine* engine;
 Node* scene;
@@ -206,13 +221,93 @@ void generateObj(Mesh* mesh) {
     objfile.close();
 }
 
+struct Tiffile {
+    std::string url;
+    Json::Value bbox;
+    tm date;
+    std::string path;
+
+    Tiffile(std::string url, Json::Value bbox, tm date) {
+        this->url = url;
+        this->bbox = bbox;
+        this->date = date;
+    }
+};
+
 //////////
 // MAIN //
 //////////
 
-
 using namespace std;
 int main(int argc, char* argv[]) {
+    FileDownloader* fd = new FileDownloader();
+
+    std::string base_url = "https://data.geo.admin.ch/api/stac/v0.9/collections/ch.swisstopo.swissalti3d";
+
+    // Replace with user request
+    float filter_bbox[2][2];
+    float posx = 8.85919;
+    float posy = 46.22313;
+    float r = 0.01;
+
+    // Requesting files from API
+    int limit = 100;
+    filter_bbox[0][0] = posx - r;
+    filter_bbox[0][1] = posy - r;
+    filter_bbox[1][0] = posx + r;
+    filter_bbox[1][1] = posy + r;
+    std::string filter_url = "https://data.geo.admin.ch/api/stac/v0.9/collections/ch.swisstopo.swissalti3d/items?limit=" + std::to_string(limit) + "&bbox=" + std::to_string(filter_bbox[0][0]) + "%2C" + std::to_string(filter_bbox[0][1]) + "%2C" + std::to_string(filter_bbox[1][0]) + "%2C" + std::to_string(filter_bbox[1][1]);
+    Json::Value filter_json = fd->JsonParser(fd->MyHTTPRequest(filter_url));
+    const Json::Value items = filter_json["features"];
+    std::cout << "Items json size: " + std::to_string(items.size()) << std::endl;
+
+    // Filtering old files
+    vector<Tiffile*> files;
+    for (Json::Value::const_iterator itr = items.begin(); itr != items.end(); itr++) {
+        tm time;
+        istringstream time_str((*itr)["properties"]["datetime"].asString());
+        time_str >> std::get_time(&time, "%Y-%m-%dT%H:%M:%S");
+        auto tp1 = std::chrono::system_clock::from_time_t(std::mktime(&time));
+        string url = (*itr)["assets"][(*itr)["assets"].getMemberNames()[0]]["href"].asString();
+
+        bool isChunkPresent = false;
+        for (auto i = 0; i < files.size(); i++) {
+            if (files.at(i)->bbox == (*itr)["bbox"]) {
+                isChunkPresent = true;
+                auto tp2 = std::chrono::system_clock::from_time_t(std::mktime(&(files.at(i)->date)));
+                cout << time_str.str() << " ---  " << std::put_time(&(files.at(i)->date), "%Y-%m-%dT%H:%M:%S") << endl;
+                if (tp1 > tp2) {
+                    cout << "Replaced " << files.at(i)->url << " with " << url << endl;
+                    Tiffile* f = new Tiffile(url, (*itr)["bbox"], time);
+                    f->path = "./files/" + FileDownloader::get_file_name(url);
+                    files.at(i) = f;
+                }
+                break;
+            }
+        }
+        if (!isChunkPresent) {
+            Tiffile* f = new Tiffile(url, (*itr)["bbox"], time);
+            f->path = "./files/" + FileDownloader::get_file_name(url);
+            files.push_back(f);
+            cout << "Added " << url << " to files" << endl;
+        }
+    }
+
+    // Downloading files
+    vector<string> urls;
+    std::vector<float> bboxes;
+    for (auto file : files) {
+        urls.push_back(file->url);
+
+        bboxes.push_back(file->bbox[0].asFloat());
+        bboxes.push_back(file->bbox[1].asFloat());
+        bboxes.push_back(file->bbox[2].asFloat());
+        bboxes.push_back(file->bbox[3].asFloat());
+    }
+
+    fd->filedownloader(urls);
+    delete fd;
+
     // Init and use the lib:
     CgEngine* engine = CgEngine::getIstance();
     engine->init(argc, argv);
@@ -225,35 +320,45 @@ int main(int argc, char* argv[]) {
     scene = new Node("[root]");
     scene->addChild(plane);
 
-    float** rasterBandData = readTiff("../swissalti3d_2022_2709-1119_0.5_2056_5728.tif");
-    Chunk* chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, 0);
-    delete rasterBandData;
-    plane->addChunk(chunk);
-    delete chunk;
+    string read_center;
+    float center_x;
+    float center_z;
+    float dim_x;
+    float dim_z;
+    for (int i = 0; i < bboxes.size()/4; i++) {
+        if (posx >= bboxes[i * 4 ] && posy >= bboxes[i * 4 + 1] && posx <= bboxes[i * 4+2] && posy <= bboxes[i * 4+3]) {
+            float** rasterBandData = readTiff(files[i]->path.c_str());
+            Chunk* chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, 0);
+            delete rasterBandData;
+            plane->addChunk(chunk);
+            delete chunk;
 
-    rasterBandData = readTiff("../swissalti3d_2022_2709-1118_0.5_2056_5728.tif");
-    chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, 1);
-    delete rasterBandData;
-    plane->addChunk(chunk);
-    delete chunk;
+            dim_x = bboxes[i * 4 + 2] - bboxes[i * 4];
+            dim_z = bboxes[i * 4 + 3] - bboxes[i * 4 + 1];
+            center_x = (bboxes[i * 4 + 2] + bboxes[i * 4]) / 2;
+            center_z = (bboxes[i * 4 + 3] + bboxes[i * 4 + 1]) / 2;
 
-    rasterBandData = readTiff("../swissalti3d_2022_2709-1120_0.5_2056_5728.tif");
-    chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, -1);
-    delete rasterBandData;
-    plane->addChunk(chunk);
-    delete chunk;
+            break;
+        }
+    }
 
-    rasterBandData = readTiff("../swissalti3d_2022_2710-1119_0.5_2056_5728.tif");
-    chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 1, 0);
-    delete rasterBandData;
-    plane->addChunk(chunk);
-    delete chunk;
+    for (int i = 0; i < bboxes.size()/4; i++) {
+        if (posx >= bboxes[i * 4] && posy >= bboxes[i * 4 + 1] && posx <= bboxes[i * 4 + 2] && posy <= bboxes[i * 4 + 3]) {
+            continue;
+        }
 
-    rasterBandData = readTiff("../swissalti3d_2022_2708-1119_0.5_2056_5728.tif");
-    chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, -1, 0);
-    delete rasterBandData;
-    plane->addChunk(chunk);
-    delete chunk;
+        float curr_center_x = (bboxes[i * 4 + 2] + bboxes[i * 4]) / 2;
+        float curr_center_z = (bboxes[i * 4 + 3] + bboxes[i * 4 + 1]) / 2;
+
+        float** rasterBandData = readTiff(files[i]->path.c_str());
+        Chunk* chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, round((curr_center_x-center_x)/dim_x), round((center_z- curr_center_z) / dim_z));
+        delete rasterBandData;
+        plane->addChunk(chunk);
+        delete chunk;
+    }
+    
+    FileDownloader::clearFolder("./files");
+    
 
     plane->initVAO();
 
@@ -265,7 +370,6 @@ int main(int argc, char* argv[]) {
     // Add cameras to the scene
     staticCam = new PerspectiveCamera("camera", 1.0f, 3000.0f, 45.0f, 1.0f);
     glm::mat4 s_camera_M = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 600.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(240.0f), glm::vec3(0.0f, 1.0f, 0.0f));//* glm::rotate(glm::mat4(1.0f), glm::radians(-2.0f), glm::vec3(1.0f, 0.0f, 1.0f)) )
-    //glm::mat4 s_camera_M = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     staticCam->setObjectCoordinates(s_camera_M);
 
     scene->addChild(staticCam);
