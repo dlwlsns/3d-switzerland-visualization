@@ -133,14 +133,14 @@ float** readTiff(const char* path) {
     // create object of Geotiff class
     tiff->Open(path);
 
-    cout << tiff->GetFileName() << endl;
+    cout << "Reading " << tiff->GetFileName() << endl;
 
     // dump out Geotiff band NoData value (often it is -9999.0)
     //cout << "No data value: " << tiff->GetNoDataValue() << endl;
 
     // dump out array (band) dimensions of Geotiff data  
-    int* dims = tiff->GetDimensions();
-    cout << dims[0] << " " << dims[1] << " " << dims[2] << endl;
+    //int* dims = tiff->GetDimensions();
+    //cout << dims[0] << " " << dims[1] << " " << dims[2] << endl;
 
     // output a value from 2D array  
     float** rasterBandData = tiff->GetRasterBand(1);
@@ -159,12 +159,8 @@ Chunk* generateChunk(float size, int tesselation, float** heights, int x, int z)
     }
     Chunk* chunk = new Chunk(x, z);
 
-    std::cout << "Drawing Grid" << std::endl;
-    std::cout << "Size: " << size << std::endl;
-    std::cout << "Tesselation: " << tesselation << std::endl;
     // Compute starting coordinates and step size:
     float triangleSize = size / (float)tesselation;
-    std::cout << "Triangle size: " << triangleSize << std::endl;
 
     // Generate all verticies
     cout << "Generating verticies..." << endl;
@@ -246,11 +242,49 @@ int main(int argc, char* argv[]) {
 
     std::string base_url = "https://data.geo.admin.ch/api/stac/v0.9/collections/ch.swisstopo.swissalti3d";
 
-    // Replace with user request
     float filter_bbox[2][2];
-    float posx = 8.85919;
+    float posx = 0.0;
+    float posy = 0.0;
+    float r = 0.001;
+
+    //Example V. Verzasca
+    /*float posx = 8.85919;
     float posy = 46.22313;
-    float r = 0.01;
+    float r = 0.01;*/
+
+    std::string input;
+    bool isValidInput = true;
+
+    std::cout << "Welcome to the 3D Switzerland visualization application, to find the location you want to see use map.geo.admin.ch (coordinates WGS 84)" << std::endl;
+
+    std::cout << "Enter the y coordinate: ";
+    std::getline(std::cin, input);
+    std::istringstream(input) >> posy;
+    if (std::isnan(posy)) {
+        std::cout << "Invalid input: y coordinate is not a floating-point number." << std::endl;
+        isValidInput = false;
+    }
+
+    std::cout << "Enter the x coordinate: ";
+    std::getline(std::cin, input);
+    std::istringstream(input) >> posx;
+    if (std::isnan(posx)) {
+        std::cout << "Invalid input: x coordinate is not a floating-point number." << std::endl;
+        isValidInput = false;
+    }
+
+    std::cout << "Enter the radius: ";
+    std::getline(std::cin, input);
+    std::istringstream(input) >> r;
+    if (std::isnan(r)) {
+        std::cout << "Invalid input: radius is not a floating-point number." << std::endl;
+        isValidInput = false;
+    }
+
+    if (isValidInput) {
+        // Do something with the valid input
+        std::cout << "The circle with center (" << posx << ", " << posy << ") and radius " << r << " is valid." << std::endl;
+    }
 
     // Requesting files from API
     int limit = 100;
