@@ -30,9 +30,13 @@ public:
 	Chunk(int x, int z);
 	virtual ~Chunk();
 
+	void setX(int x);
+	void setZ(int z);
+
 	void addVertex(glm::vec3 vertex);
 	std::vector<Vertex*> getVertecies();
 	void addEdge(Vertex* start, Vertex* end);
 	void addFace(int v0, int v1, int v2);
 	std::vector<Face*> getFaces();
+	void empty();
 };

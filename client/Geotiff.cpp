@@ -24,9 +24,20 @@
 
     // define constructor function to instantiate object
     // of this Geotiff class. 
-    Geotiff(const char* tiffname) {
-        filename = tiffname;
+    Geotiff() {
         GDALAllRegister();
+    }
+
+    // define destructor function to close dataset, 
+    // for when object goes out of scope or is removed
+    // from memory. 
+    ~Geotiff() {
+        // free memory for array.  
+        GDALDestroyDriverManager();
+    }
+
+    const void Open(const char* tiffname) {
+        filename = tiffname;
 
         // set pointer to Geotiff dataset as class member.  
         geotiffDataset = (GDALDataset*)GDALOpen(filename, GA_ReadOnly);
@@ -35,16 +46,11 @@
         NROWS = GDALGetRasterYSize(geotiffDataset);
         NCOLS = GDALGetRasterXSize(geotiffDataset);
         NLEVELS = GDALGetRasterCount(geotiffDataset);
-
     }
 
-    // define destructor function to close dataset, 
-    // for when object goes out of scope or is removed
-    // from memory. 
-    ~Geotiff() {
-        // close the Geotiff dataset, free memory for array.  
+    const void Close() {
+        // close the Geotiff dataset
         GDALClose(geotiffDataset);
-        GDALDestroyDriverManager();
     }
 
     const char* GetFileName() {

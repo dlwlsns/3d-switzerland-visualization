@@ -64,6 +64,13 @@ void FileDownloader::download_file(const std::string& url, const std::string& ou
 	std::string output_file = output_dir + "/" + get_file_name(url);
 	std::ofstream myfile;
 
+	if (fs::exists(output_file)) {
+		std::cout << "Already present: " << output_file << std::endl;
+		return;
+	}
+	
+	std::cout << "Downloading " << get_file_name(url);
+
 	FILE* fp = fopen(output_file.c_str(), "wb");
 
 	if (fp) {
@@ -79,7 +86,7 @@ void FileDownloader::download_file(const std::string& url, const std::string& ou
 
 	// Lock cout and print status
 	//std::lock_guard<std::mutex> lock(m);
-	std::cout << "Downloaded " << url << " to " << output_file << std::endl;
+	std::cout << " Done" << std::endl;
 }
 
 void FileDownloader::clearFolder(const std::string& dir_path) {

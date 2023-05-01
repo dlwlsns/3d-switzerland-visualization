@@ -128,9 +128,10 @@ void specialCallback(int key, int mouseX, int mouseY)
 
 Mesh* plane = new Mesh("plane");
 
+Geotiff* tiff = new Geotiff();
 float** readTiff(const char* path) {
     // create object of Geotiff class
-    Geotiff* tiff = new Geotiff(path);
+    tiff->Open(path);
 
     cout << tiff->GetFileName() << endl;
 
@@ -144,7 +145,8 @@ float** readTiff(const char* path) {
     // output a value from 2D array  
     float** rasterBandData = tiff->GetRasterBand(1);
 
-    delete tiff;
+    tiff->Close();
+    //delete tiff;
 
     return rasterBandData;
 }
@@ -350,8 +352,8 @@ int main(int argc, char* argv[]) {
         plane->addChunk(chunk);
         delete chunk;
     }
-    
-    FileDownloader::clearFolder("./files");
+
+    delete tiff;
 
     cout << "Loaded " << urls.size() << " files" << endl;
     

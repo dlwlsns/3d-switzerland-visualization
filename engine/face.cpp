@@ -1,7 +1,6 @@
 #include "face.h"
 #include "edge.h"
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 unsigned int Face::idCounter = 0;
 

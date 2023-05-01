@@ -6,22 +6,17 @@
 Chunk::Chunk(int x, int z) : x(x), z(z) {}
 
 Chunk::~Chunk() {
-    while (!verticies.empty()) {
-        delete verticies.back();
-        verticies.pop_back();
-    }
-
-    while (!edges.empty()) {
-        delete edges.back();
-        edges.pop_back();
-    }
-
-    while (!faces.empty()) {
-        delete faces.back();
-        faces.pop_back();
-    }
+    empty();
 
     std::cout << "Deleted chunk" << std::endl;
+}
+
+void Chunk::setX(int x) {
+    this->x = x;
+}
+
+void Chunk::setZ(int z) {
+    this->z = z;
 }
 
 void Chunk::addVertex(glm::vec3 vertex) {
@@ -52,4 +47,21 @@ void Chunk::addFace(int v0, int v1, int v2) {
 
 std::vector<Face*> Chunk::getFaces() {
     return this->faces;
+}
+
+void Chunk::empty() {
+    while (!verticies.empty()) {
+        delete verticies.back();
+        verticies.pop_back();
+    }
+
+    while (!edges.empty()) {
+        delete edges.back();
+        edges.pop_back();
+    }
+
+    while (!faces.empty()) {
+        delete faces.back();
+        faces.pop_back();
+    }
 }
