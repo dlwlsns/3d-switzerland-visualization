@@ -5,6 +5,7 @@
 #include "node.h"
 #include "face.h"
 #include "vertex.h"
+#include "chunk.h"
 
 class LIB_API Mesh : public Node
 {
@@ -18,6 +19,7 @@ class LIB_API Mesh : public Node
 		Mesh(char* name);
 		virtual ~Mesh();
 
+		void addChunk(Chunk* chunk);
 		void addVerticies(std::vector<Vertex*> verticies);
 		std::vector<glm::vec3> getVerticies();
 		void addFaces(std::vector<Face*> faces);
