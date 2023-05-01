@@ -308,13 +308,7 @@ int main(int argc, char* argv[]) {
     fd->filedownloader(urls);
     delete fd;
 
-    // Init and use the lib:
-    CgEngine* engine = CgEngine::getIstance();
-    engine->init(argc, argv);
-
-    // Set callbacks
-    engine->setKeyboardCallback(keyboardCallback);
-    engine->setSpecialCallback(specialCallback);
+    
 
     // Load scene
     scene = new Node("[root]");
@@ -358,7 +352,16 @@ int main(int argc, char* argv[]) {
     }
     
     FileDownloader::clearFolder("./files");
+
+    cout << "Loaded " << urls.size() << " files" << endl;
     
+    // Init and use the lib:
+    CgEngine* engine = CgEngine::getIstance();
+    engine->init(argc, argv);
+
+    // Set callbacks
+    engine->setKeyboardCallback(keyboardCallback);
+    engine->setSpecialCallback(specialCallback);
 
     plane->initVAO();
 
@@ -375,6 +378,8 @@ int main(int argc, char* argv[]) {
     scene->addChild(staticCam);
 
     cout << "Added camera" << endl;
+
+    
 
     // Parse selected scene and run
     engine->parse(scene);
