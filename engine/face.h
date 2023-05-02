@@ -15,6 +15,6 @@ class Face
 		Face(Edge* edge);
 		~Face();
 
-		void draw();
+		glm::vec3 getNormal() const;
 };
 

@@ -348,7 +348,8 @@ int main(int argc, char* argv[]) {
 
     // Load scene
     scene = new Node("[root]");
-    scene->addChild(plane);
+    std::vector<Mesh*> ChunkMeshes;
+    //scene->addChild(plane);
 
     string read_center;
     float center_x;
@@ -360,7 +361,9 @@ int main(int argc, char* argv[]) {
             float** rasterBandData = readTiff(files[i]->path.c_str());
             Chunk* chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, 0);
             delete rasterBandData;
-            plane->addChunk(chunk);
+            ChunkMeshes.push_back(new Mesh("0-0"));
+            ChunkMeshes.back()->addChunk(chunk);
+            scene->addChild(ChunkMeshes.back());
             delete chunk;
 
             dim_x = bboxes[i * 4 + 2] - bboxes[i * 4];
@@ -383,7 +386,10 @@ int main(int argc, char* argv[]) {
         float** rasterBandData = readTiff(files[i]->path.c_str());
         Chunk* chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, round((curr_center_x-center_x)/dim_x), round((center_z- curr_center_z) / dim_z));
         delete rasterBandData;
-        plane->addChunk(chunk);
+        ChunkMeshes.push_back(new Mesh("0-0"));
+        //chunk.simplify();
+        ChunkMeshes.back()->addChunk(chunk);
+        scene->addChild(ChunkMeshes.back());
         delete chunk;
     }
 
@@ -399,7 +405,11 @@ int main(int argc, char* argv[]) {
     engine->setKeyboardCallback(keyboardCallback);
     engine->setSpecialCallback(specialCallback);
 
-    plane->initVAO();
+    //plane->initVAO();
+    for (auto mesh : ChunkMeshes) {
+
+        mesh->initVAO();
+    }
 
     if (generateObjFile) {
         generateObj(plane);

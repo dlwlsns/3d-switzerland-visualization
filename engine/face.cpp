@@ -15,3 +15,17 @@ Face::Face(Edge* edge) {
 Face::~Face() {
 	//delete edge;
 }
+
+glm::vec3 Face::getNormal() const {
+    glm::vec3 A = edge->start->point;
+    glm::vec3 B = edge->end->point;
+    glm::vec3 C = edge->next->end->point;
+
+    glm::vec3 AB = B - A;
+    glm::vec3 AC = C - A;
+
+    glm::vec3 normal = glm::cross(AB, AC);
+    normal = glm::normalize(normal);
+
+    return normal;
+}
