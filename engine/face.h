@@ -16,5 +16,7 @@ class Face
 		~Face();
 
 		glm::vec3 getNormal() const;
+		void replace(Vertex* oldVertex, Vertex* newVertex);
+		void remove(Edge* edgeToRemove);
 };
 

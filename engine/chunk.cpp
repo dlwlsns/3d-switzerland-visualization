@@ -71,13 +71,17 @@ void Chunk::empty() {
 }
 
 void Chunk::simplify(unsigned int targetVertexCount) {
+    std::cout << "Target vertex count: " << targetVertexCount << std::endl;
     std::vector<PMVertex*> pmVertices;
     std::vector<PMEdge*> pmEdges;
 
+    std::cout << "Start initializePMData" << std::endl;
     initializePMData(pmVertices, pmEdges);
 
     // Simplify the mesh until the target vertex count is reached
     while (pmVertices.size() > targetVertexCount) {
+        if(pmVertices.size() % 500000 == 0)
+            std::cout << "Cycling... Size:" << pmVertices.size() << std::endl;
         // Find the edge with the lowest error
         PMEdge* minErrorEdge = *std::min_element(pmEdges.begin(), pmEdges.end(),
             [](const PMEdge* a, const PMEdge* b) { return a->error < b->error; });
@@ -95,19 +99,23 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         pmVertices.erase(std::remove(pmVertices.begin(), pmVertices.end(), minErrorEdge->v2), pmVertices.end());
 
         // Update the edges connected to the removed vertex
+        std::vector<PMEdge*> edgesToUpdate;
         for (PMEdge* edge : minErrorEdge->v2->edges) {
             if (edge != minErrorEdge) {
-                edge->v1 == minErrorEdge->v2 ? edge->v1 = minErrorEdge->v1 : edge->v2 = minErrorEdge->v1;
-                edge->error = calculateEdgeError(edge);
-                minErrorEdge->v1->edges.push_back(edge);
+                edgesToUpdate.push_back(edge);
             }
         }
+
+        for (PMEdge* edge : edgesToUpdate) {
+            edge->v1 == minErrorEdge->v2 ? edge->v1 = minErrorEdge->v1 : edge->v2 = minErrorEdge->v1;
+            edge->error = calculateEdgeError(edge);
+            minErrorEdge->v1->edges.push_back(edge);
+        }
+
 
         // Remove the collapsed edge from the mesh
         pmEdges.erase(std::remove(pmEdges.begin(), pmEdges.end(), minErrorEdge), pmEdges.end());
     }
-
-    // Reconstruct the simplified mesh
 }
 
 void Chunk::createFromPMData(const std::vector<PMVertex*>& vertices, const std::vector<PMEdge*>& edges) {
@@ -182,6 +190,7 @@ void collapseEdge(PMEdge* edge, std::vector<PMVertex*>& vertices, std::vector<PM
 }
 
 void Chunk::initializePMData(std::vector<PMVertex*>& pmVertices, std::vector<PMEdge*>& pmEdges) {
+    //std::cout << "First for" << std::endl;
     for (const auto& vertex : verticies) {
         PMVertex* pmVertex = new PMVertex();
         pmVertex->id = vertex->id;
@@ -189,21 +198,24 @@ void Chunk::initializePMData(std::vector<PMVertex*>& pmVertices, std::vector<PME
         pmVertices.push_back(pmVertex);
     }
 
+    //std::cout << "Second for" << std::endl;
     for (const auto& face : faces) {
         glm::vec3 normal = face->getNormal();
         float distance = -glm::dot(normal, face->edge->start->point);
         glm::vec4 plane(normal, distance);
 
-        for (Edge* e = face->edge; e != face->edge->prev; e = e->next) {
+        for (Edge* e = face->edge; e->next != face->edge; e = e->next) {
             unsigned int vertexId = e->start->id;
             pmVertices[vertexId]->quadric += glm::outerProduct(plane, plane);
         }
     }
 
+    //std::cout << "Third for" << std::endl;
     for (const auto& edge : this->edges) {
         PMEdge* pmEdge = new PMEdge();
         pmEdge->v1 = pmVertices[edge->start->id];
         pmEdge->v2 = pmVertices[edge->end->id];
+        //std::cout << "Start calculateEdgeError" << std::endl;
         pmEdge->error = calculateEdgeError(pmEdge);
         pmEdges.push_back(pmEdge);
 
@@ -216,6 +228,7 @@ float Chunk::calculateEdgeError(PMEdge* edge) {
     glm::mat4 sumQuadrics = edge->v1->quadric + edge->v2->quadric;
 
     // Find the optimal vertex position that minimizes the QEM error
+    //std::cout << "Start findOptimalPosition" << std::endl;
     glm::vec4 optimalPosition = findOptimalPosition(sumQuadrics, edge->v1, edge->v2);
 
     // Calculate the QEM error for the edge
