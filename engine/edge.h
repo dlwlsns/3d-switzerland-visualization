@@ -4,6 +4,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "vertex.h"
 
+class Vertex;
+
 class Edge
 {
 	public:
@@ -15,9 +17,15 @@ class Edge
 		Edge* prev;
 		Edge* twin;
 
+		float error;
+		bool deleted;
+
 		static unsigned int idCounter;
 
 		Edge(Vertex* start, Vertex* end);
 		~Edge();
+
+		glm::vec4 findOptimalPosition(const glm::mat4& sumQuadrics);
+		float calculateEdgeError();
 };
 

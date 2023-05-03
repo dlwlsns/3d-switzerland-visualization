@@ -4,8 +4,6 @@
 #include "vertex.h"
 #include "edge.h"
 #include "face.h"
-#include "PMEdge.h"
-#include "PMVertex.h"
 
 #ifdef _WINDOWS 	
 // Export API:
@@ -42,8 +40,4 @@ public:
 	std::vector<Face*> getFaces();
 	void empty();
 	void simplify(unsigned int targetVertexCount);
-	void initializePMData(std::vector<PMVertex*>& vertices, std::vector<PMEdge*>& edges);
-	void createFromPMData(const std::vector<PMVertex*>& vertices, const std::vector<PMEdge*>& edges);
-	float calculateEdgeError(PMEdge* edge);
-	glm::vec4 findOptimalPosition(const glm::mat4& sumQuadrics, const PMVertex* v1, const PMVertex* v2);
 };

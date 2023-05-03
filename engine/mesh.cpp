@@ -20,6 +20,7 @@ void Mesh::addChunk(Chunk* chunk) {
 void Mesh::addVerticies(std::vector<Vertex*> verticies) {
     unsigned int newId = this->verticies.size();
 
+    this->verticies.reserve(verticies.size());
     for (int i = 0; i < verticies.size(); i++) {
         verticies[i]->id = newId;
         this->verticies.push_back(verticies[i]->point);
@@ -34,6 +35,8 @@ std::vector<glm::vec3> Mesh::getVerticies() {
 }
 
 void Mesh::addFaces(std::vector<Face*> faces) {
+    this->faces.reserve(faces.size() * 3);
+
     for (int i = 0; i < faces.size(); i++) {
         this->faces.push_back(faces[i]->edge->start->id);
         this->faces.push_back(faces[i]->edge->end->id);

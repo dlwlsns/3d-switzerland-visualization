@@ -112,8 +112,6 @@
     <ClInclude Include="chunk.h" />
     <ClInclude Include="edge.h" />
     <ClInclude Include="face.h" />
-    <ClInclude Include="PMEdge.h" />
-    <ClInclude Include="PMVertex.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="object.h" />

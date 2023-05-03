@@ -250,7 +250,7 @@ int main(int argc, char* argv[]) {
     //Example V. Verzasca
     /*float posx = 8.85919;
     float posy = 46.22313;
-    float r = 0.01;*/
+    float r = 0.001;*/
 
     std::string input;
     bool isValidInput = true;
@@ -356,17 +356,20 @@ int main(int argc, char* argv[]) {
     float center_z;
     float dim_x;
     float dim_z;
+    
+    Chunk* chunk;
+
     for (int i = 0; i < bboxes.size()/4; i++) {
         if (posx >= bboxes[i * 4 ] && posy >= bboxes[i * 4 + 1] && posx <= bboxes[i * 4+2] && posy <= bboxes[i * 4+3]) {
             float** rasterBandData = readTiff(files[i]->path.c_str());
-            Chunk* chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, 0);
+            chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, 0);
             delete rasterBandData;
             ChunkMeshes.push_back(new Mesh("0-0"));
             //cout << "Starting simplifying..." << endl;
-            //chunk->simplify(chunk->getVertecies().size()*0.99999f);
+            //chunk->simplify(chunk->getVertecies().size()*0.5f);
             ChunkMeshes.back()->addChunk(chunk);
             scene->addChild(ChunkMeshes.back());
-            delete chunk;
+            chunk->empty();
 
             dim_x = bboxes[i * 4 + 2] - bboxes[i * 4];
             dim_z = bboxes[i * 4 + 3] - bboxes[i * 4 + 1];
@@ -386,14 +389,16 @@ int main(int argc, char* argv[]) {
         float curr_center_z = (bboxes[i * 4 + 3] + bboxes[i * 4 + 1]) / 2;
 
         float** rasterBandData = readTiff(files[i]->path.c_str());
-        Chunk* chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, round((curr_center_x-center_x)/dim_x), round((center_z- curr_center_z) / dim_z));
+        chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, round((curr_center_x-center_x)/dim_x), round((center_z- curr_center_z) / dim_z));
         delete rasterBandData;
         ChunkMeshes.push_back(new Mesh("1-1"));
-        //chunk.simplify();
+        chunk->simplify(chunk->getVertecies().size() * 0.5f);
         ChunkMeshes.back()->addChunk(chunk);
         scene->addChild(ChunkMeshes.back());
-        delete chunk;
+        chunk->empty();
     }
+
+    delete chunk;
 
     delete tiff;
 
