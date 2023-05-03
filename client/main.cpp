@@ -362,9 +362,8 @@ int main(int argc, char* argv[]) {
             Chunk* chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, 0, 0);
             delete rasterBandData;
             ChunkMeshes.push_back(new Mesh("0-0"));
-            // °-° - UwU
-            cout << "Starting simplifying..." << endl;
-            chunk->simplify(chunk->getVertecies().size()*0.99999f);
+            //cout << "Starting simplifying..." << endl;
+            //chunk->simplify(chunk->getVertecies().size()*0.99999f);
             ChunkMeshes.back()->addChunk(chunk);
             scene->addChild(ChunkMeshes.back());
             delete chunk;
@@ -377,7 +376,7 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
-    /*
+    
     for (int i = 0; i < bboxes.size()/4; i++) {
         if (posx >= bboxes[i * 4] && posy >= bboxes[i * 4 + 1] && posx <= bboxes[i * 4 + 2] && posy <= bboxes[i * 4 + 3]) {
             continue;
@@ -389,12 +388,12 @@ int main(int argc, char* argv[]) {
         float** rasterBandData = readTiff(files[i]->path.c_str());
         Chunk* chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, round((curr_center_x-center_x)/dim_x), round((center_z- curr_center_z) / dim_z));
         delete rasterBandData;
-        ChunkMeshes.push_back(new Mesh("0-0"));
+        ChunkMeshes.push_back(new Mesh("1-1"));
         //chunk.simplify();
         ChunkMeshes.back()->addChunk(chunk);
         scene->addChild(ChunkMeshes.back());
         delete chunk;
-    }*/
+    }
 
     delete tiff;
 
