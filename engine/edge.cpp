@@ -26,7 +26,8 @@ Edge::~Edge() {
 glm::vec4 Edge::findOptimalPosition(const glm::mat4& sumQuadrics) {
     return (glm::vec4(start->point.x, start->point.y, start->point.z, 1.0f) + glm::vec4(end->point.x, end->point.y, end->point.z, 1.0f))/2.0f;
 
-    glm::mat4 A = sumQuadrics;
+    // This is broken
+    /*glm::mat4 A = sumQuadrics;
     A[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
     glm::vec4 b = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -41,7 +42,7 @@ glm::vec4 Edge::findOptimalPosition(const glm::mat4& sumQuadrics) {
         x = glm::vec4(start->point + end->point, 1.0f) * 0.5f;
     }
 
-    return x;
+    return x;*/
 }
 
 float Edge::calculateEdgeError() {

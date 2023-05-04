@@ -2,8 +2,7 @@
 
 #include <iostream>
 #include <algorithm>
-#include <map>
-#include <queue>
+#include <list>
 
 Chunk::Chunk(int x, int z) : x(x), z(z) {}
 
@@ -80,14 +79,18 @@ void Chunk::empty() {
     }
 }
 
+// Sort edges from lower error to higher (not deleted before)
 struct compare_edges {
     inline bool operator()(const Edge* left, const Edge* right) const {
-        if (left->deleted && !right->deleted)
-            return false;
-        else if (!left->deleted && right->deleted)
+        /*if (left->deleted && !right->deleted)
             return true;
-        else
-            return left->error > right->error;
+        else if (!left->deleted && right->deleted)
+            return false;
+        else if (!left->deleted && !right->deleted)
+            return left->error < right->error;
+        else return false;*/
+
+        return left->error > right->error;
     }
 };
 
@@ -95,16 +98,26 @@ unsigned int deleted = 0;
 void Chunk::simplify(unsigned int targetVertexCount) {
     std::cout << "Target vertex count: " << targetVertexCount << std::endl;
 
-    // Simplify the mesh until the target vertex count is reached
     std::sort(edges.begin(), edges.end(), compare_edges{});
 
+    // Simplify the mesh until the target vertex count is reached
     Edge* minErrorEdge;
     int count = 0;
     while (verticies.size()-deleted > targetVertexCount) {
-        if(deleted % 1000000 == 0)
-            std::cout << "Cycling... Size:" << verticies.size()-deleted << std::endl;
+        
         // Find the edge with the lowest error        
         minErrorEdge = edges[count];
+
+        if (minErrorEdge->deleted || minErrorEdge->start->deleted || minErrorEdge->end->deleted) {
+            minErrorEdge->deleted = true;
+
+            count++;
+            continue;
+        }
+        else {
+            if (deleted % 100000 == 0)
+                std::cout << "Cycling... Size:" << verticies.size() - deleted << std::endl;
+        }
 
         // Update the position of the first vertex of the edge
         minErrorEdge->start->point = glm::vec3(minErrorEdge->findOptimalPosition(minErrorEdge->start->quadric + minErrorEdge->end->quadric));
@@ -116,36 +129,36 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         // Collapsing the edge
         minErrorEdge->deleted = true;
         minErrorEdge->end->deleted = true;
-        minErrorEdge->end = minErrorEdge->start;
-        minErrorEdge->next->start = minErrorEdge->start;
+        //minErrorEdge->end = minErrorEdge->start;
+        //minErrorEdge->next->start = minErrorEdge->start;
 
+        // Updating edges connected to the removed vertex
         for (auto& edge : minErrorEdge->end->edges) {
             if (edge->deleted) {
                 continue;
             }
 
             if (edge->start == minErrorEdge->end) {
-                edge->start = minErrorEdge->start;
+                //edge->start = minErrorEdge->start;
             }
             else {
-                edge->end = minErrorEdge->start;
+                //edge->end = minErrorEdge->start;
             }
+
+            edge->error = edge->calculateEdgeError();
         }
 
         deleted++;
         count++;
 
-        if (deleted % 10000000 == 0) {
-            for (int i = 0; i < edges.size(); i++) {
-                edges[i]->error = edges[i]->calculateEdgeError();
-            }
-
+        // Sorting the vector of edges
+        if (deleted % 1000000 == 0) {
             std::sort(edges.begin(), edges.end(), compare_edges{});
             count = 0;
         }
     }
 
-    std::cout << "Removing faces.." << std::endl;
+    /*std::cout << "Removing faces.." << std::endl;
     std::vector<Face*> newFaces;
     for (int i = 0; i < faces.size(); i++) {
         Edge* e1 = faces[i]->edge;
@@ -159,7 +172,7 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         newFaces.push_back(faces[i]);
     }
     faces.clear();
-    faces = newFaces;
+    faces = newFaces;*/
 
     /*std::cout << "Removing vertices.." << std::endl;
     std::vector<Vertex*> newVertecies;
@@ -171,9 +184,7 @@ void Chunk::simplify(unsigned int targetVertexCount) {
 
         verticies[i]->id -= deleted;
         newVertecies.push_back(verticies[i]);
-    }
-    verticies.clear();
-    verticies = newVertecies;*/
+    }*/
 
     deleted = 0;
 }
