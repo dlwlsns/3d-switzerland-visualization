@@ -390,7 +390,7 @@ int main(int argc, char* argv[]) {
         chunk = generateChunk(2000.0f, 2000.0f, rasterBandData, round((curr_center_x-center_x)/dim_x), round((center_z- curr_center_z) / dim_z));
         delete rasterBandData;
         ChunkMeshes.push_back(new Mesh("1-1"));
-        chunk->simplify(chunk->getVertecies().size() * 0.8f);
+        chunk->simplify(chunk->getVertecies().size() * 0.5f);
         ChunkMeshes.back()->addChunk(chunk);
         scene->addChild(ChunkMeshes.back());
         chunk->empty();

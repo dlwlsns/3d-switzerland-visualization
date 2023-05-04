@@ -42,20 +42,3 @@ void Face::replace(Vertex* oldVertex, Vertex* newVertex) {
         currentEdge = currentEdge->next;
     } while (currentEdge != edge);
 }
-
-void Face::remove(Edge* edgeToRemove) {
-    if (edge == edgeToRemove) {
-        edge = edge->next;
-    }
-
-    Edge* currentEdge = edge;
-    do {
-        if (currentEdge->next == edgeToRemove) {
-            currentEdge->next = edgeToRemove->next;
-        }
-        if (currentEdge->prev == edgeToRemove) {
-            currentEdge->prev = edgeToRemove->prev;
-        }
-        currentEdge = currentEdge->next;
-    } while (currentEdge != edge);
-}

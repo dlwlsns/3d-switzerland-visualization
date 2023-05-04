@@ -56,5 +56,5 @@ float Edge::calculateEdgeError() {
     // Calculate the QEM error for the edge
     float error = glm::dot(optimalPosition * sumQuadrics, optimalPosition);
 
-    return error;
+    return abs(error);
 }

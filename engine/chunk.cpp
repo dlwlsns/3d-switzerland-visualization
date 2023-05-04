@@ -109,7 +109,7 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         
         // Find the edge with the lowest error        
         minErrorEdge = edges[count];
-
+        //std::cout << "Error:" << minErrorEdge->error << std::endl;
         if (minErrorEdge->deleted || minErrorEdge->start->deleted || minErrorEdge->end->deleted) {
             minErrorEdge->deleted = true;
 
@@ -132,63 +132,97 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         // Collapsing the edge
         minErrorEdge->deleted = true;
         minErrorEdge->end->deleted = true;
-        minErrorEdge->end = minErrorEdge->start;
 
-        // Updating edges connected to the removed vertex
-        for (auto& edge : minErrorEdge->end->edges) {
-            minErrorEdge->start->edges.push_back(edge);
-
-            if (edge->deleted) {
-                continue;
-            }
-
-            /*if (edge->start == minErrorEdge->end) {
+        //minErrorEdge->next->start = minErrorEdge->end;
+        // 
+        // Update the affected edges and faces
+        /*for (auto& edge : minErrorEdge->start->edges) {
+            if (edge->start == minErrorEdge->end) {
                 edge->start = minErrorEdge->start;
             }
-            if (edge->end == minErrorEdge->end) {
+            else if (edge->end == minErrorEdge->end) {
                 edge->end = minErrorEdge->start;
-            }*/
-
-            edge->error = edge->calculateEdgeError();
-        }
-
+            }
+        }*/
+        
         deleted++;
         count++;
 
         // Sorting the vector of edges
         if (deleted % 1000000 == 0) {
+
+            for (auto& face : faces) {
+                if (face->edge->deleted) {
+                    face->edge = face->edge->next;
+                }
+            }
+
+            /*
+            for (auto& edge : edges) {
+                if (edge->end->deleted) {
+                    edge->end = minErrorEdge->start;
+                }
+            }*/
+
+            // Updating edges connected to the removed vertex
+            for (auto& edge : edges) {
+                if (edge->deleted) {
+                    continue;
+                }
+
+                /*if (edge->start == minErrorEdge->end) {
+                    edge->start = minErrorEdge->start;
+                }
+                if (edge->end == minErrorEdge->end) {
+                    edge->end = minErrorEdge->start;
+                }*/
+
+                edge->error = edge->calculateEdgeError();
+            }
             std::sort(edges.begin(), edges.end(), compare_edges{});
             count = 0;
         }
     }
 
-    /*std::cout << "Removing faces.." << std::endl;
+    for (auto& face : faces) {
+        if (face->edge->deleted) {
+            face->edge = face->edge->next;
+        }
+    }
+
+    /*
+    std::cout << "Removing faces.." << std::endl;
     std::vector<Face*> newFaces;
     for (int i = 0; i < faces.size(); i++) {
         Edge* e1 = faces[i]->edge;
         Edge* e2 = e1->next;
 
         if (e1->deleted || e2->deleted) {
-            delete faces[i];
-            continue;
+            //delete faces[i];
         }
-        
-        newFaces.push_back(faces[i]);
+        else {
+            newFaces.push_back(faces[i]);
+        }
     }
     faces.clear();
     faces = newFaces;*/
-
-    /*std::cout << "Removing vertices.." << std::endl;
+    /*
+    std::cout << "Removing vertices.." << std::endl;
     std::vector<Vertex*> newVertecies;
+    int j = 0;
     for (int i = 0; i < verticies.size(); i++) {
         if (verticies[i]->deleted) {
-            delete verticies[i];
-            continue;
+            //delete verticies[i];
+            //continue;
         }
+        else {
+            verticies[i]->id -= j;
+            newVertecies.push_back(verticies[i]);
+            j++;
+        }
+    }
+    verticies.clear();
+    verticies = newVertecies;
 
-        verticies[i]->id -= deleted;
-        newVertecies.push_back(verticies[i]);
-    }*/
-
-    deleted = 0;
+    deleted = 0;*/
 }
