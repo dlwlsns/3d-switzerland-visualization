@@ -23,7 +23,8 @@ void Chunk::setZ(int z) {
 void Chunk::addVertex(glm::vec3 vertex) {
     vertex.x += (x * 2000);
     vertex.z += (z * 2000);
-    this->verticies.push_back(new Vertex(vertex));
+    Vertex* v = new Vertex(vertex);
+    this->verticies.push_back(v);
 }
 
 std::vector<Vertex*> Chunk::getVertecies() {
@@ -35,11 +36,12 @@ void Chunk::addEdge(Vertex* start, Vertex* end) {
 }
 
 void Chunk::addFace(int v0, int v1, int v2) {
-    this->edges.push_back(new Edge(this->verticies[v0], this->verticies[v1]));
-    this->edges.push_back(new Edge(this->verticies[v1], this->verticies[v2]));
-    this->edges.push_back(new Edge(this->verticies[v2], this->verticies[v0]));
-
-    
+    Edge* e1 = new Edge(this->verticies[v0], this->verticies[v1]);
+    this->edges.push_back(e1);
+    Edge* e2 = new Edge(this->verticies[v1], this->verticies[v2]);
+    this->edges.push_back(e2);
+    Edge* e3 = new Edge(this->verticies[v2], this->verticies[v0]);
+    this->edges.push_back(e3);
 
     this->edges.end()[-3]->next = this->edges.end()[-2];
     this->edges.end()[-2]->next = this->edges.end()[-1];
@@ -53,9 +55,9 @@ void Chunk::addFace(int v0, int v1, int v2) {
     glm::vec4 plane(normal, distance);
 
 
-    this->edges.end()[-3]->start->quadric += glm::outerProduct(plane, plane);
-    this->edges.end()[-3]->end->quadric += glm::outerProduct(plane, plane);
-    this->edges.end()[-3]->next->end->quadric += glm::outerProduct(plane, plane);
+    this->edges.end()[-2]->start->quadric += glm::outerProduct(plane, plane);
+    this->edges.end()[-2]->end->quadric += glm::outerProduct(plane, plane);
+    this->edges.end()[-2]->next->end->quadric += glm::outerProduct(plane, plane);
 }
 
 std::vector<Face*> Chunk::getFaces() {
@@ -82,15 +84,15 @@ void Chunk::empty() {
 // Sort edges from lower error to higher (not deleted before)
 struct compare_edges {
     inline bool operator()(const Edge* left, const Edge* right) const {
-        /*if (left->deleted && !right->deleted)
-            return true;
-        else if (!left->deleted && right->deleted)
+        if (left->deleted && !right->deleted)
             return false;
+        else if (!left->deleted && right->deleted)
+            return true;
         else if (!left->deleted && !right->deleted)
             return left->error < right->error;
-        else return false;*/
+        else return false;
 
-        return left->error > right->error;
+        //return left->error > right->error;
     }
 };
 
@@ -115,12 +117,13 @@ void Chunk::simplify(unsigned int targetVertexCount) {
             continue;
         }
         else {
-            if (deleted % 100000 == 0)
+            if (deleted % 1000000 == 0)
                 std::cout << "Cycling... Size:" << verticies.size() - deleted << std::endl;
         }
 
         // Update the position of the first vertex of the edge
-        minErrorEdge->start->point = glm::vec3(minErrorEdge->findOptimalPosition(minErrorEdge->start->quadric + minErrorEdge->end->quadric));
+        glm::vec4 newPos = minErrorEdge->findOptimalPosition(minErrorEdge->start->quadric + minErrorEdge->end->quadric);
+        minErrorEdge->start->point = glm::vec3(newPos.x, newPos.y, newPos.z);
 
 
         // Update the quadric of the first vertex
@@ -129,21 +132,22 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         // Collapsing the edge
         minErrorEdge->deleted = true;
         minErrorEdge->end->deleted = true;
-        //minErrorEdge->end = minErrorEdge->start;
-        //minErrorEdge->next->start = minErrorEdge->start;
+        minErrorEdge->end = minErrorEdge->start;
 
         // Updating edges connected to the removed vertex
         for (auto& edge : minErrorEdge->end->edges) {
+            minErrorEdge->start->edges.push_back(edge);
+
             if (edge->deleted) {
                 continue;
             }
 
-            if (edge->start == minErrorEdge->end) {
-                //edge->start = minErrorEdge->start;
+            /*if (edge->start == minErrorEdge->end) {
+                edge->start = minErrorEdge->start;
             }
-            else {
-                //edge->end = minErrorEdge->start;
-            }
+            if (edge->end == minErrorEdge->end) {
+                edge->end = minErrorEdge->start;
+            }*/
 
             edge->error = edge->calculateEdgeError();
         }
