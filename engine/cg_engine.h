@@ -48,7 +48,6 @@ class LIB_API CgEngine
 		static CgEngine* getIstance();
 
 		bool init(int argc, char* argv[]);
-		Node* load(char* filePath);
 		void parse(Node* scene);
 		void run();
 		bool free();     
@@ -57,9 +56,4 @@ class LIB_API CgEngine
 		void setSpecialCallback(void (*func)(int, int, int));
 		void setIdleCallback(void (*func)());
 		unsigned int getElapsedTime();
-
-		void cameraRotation();
-		void toggleWireframe();
-		void changeFilter();
-		void addGuiText(char* text);
 };

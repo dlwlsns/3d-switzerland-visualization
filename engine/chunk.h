@@ -39,4 +39,6 @@ public:
 	void addFace(int v0, int v1, int v2);
 	std::vector<Face*> getFaces();
 	void empty();
+	static Chunk* create(float size, int tesselation, float** heights, int x, int z);
+	void simplify(unsigned int targetVertexCount);
 };

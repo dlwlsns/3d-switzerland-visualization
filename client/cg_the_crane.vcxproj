@@ -100,8 +100,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FileDownloader.cpp" />
-    <ClCompile Include="Geotiff.cpp" />
+    <ClCompile Include="fileDownloader.cpp" />
+    <ClCompile Include="geotiff.cpp" />
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
@@ -110,7 +110,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileDownloader.h" />
+    <ClInclude Include="fileDownloader.h" />
+    <ClInclude Include="geotiff.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
