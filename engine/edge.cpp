@@ -19,9 +19,7 @@ Edge::Edge(Vertex* start, Vertex* end) {
 	idCounter++;
 }
 
-Edge::~Edge() {
-
-}
+Edge::~Edge() {}
 
 glm::vec4 Edge::findOptimalPosition(const glm::mat4& sumQuadrics) {
     glm::vec3 dum = (this->start->point + this->end->point) / 2.0f;
@@ -50,7 +48,6 @@ float Edge::calculateEdgeError() {
     glm::mat4 sumQuadrics = start->quadric + end->quadric;
 
     // Find the optimal vertex position that minimizes the QEM error
-    //std::cout << "Start findOptimalPosition" << std::endl;
     glm::vec4 optimalPosition = findOptimalPosition(sumQuadrics);
 
     // Calculate the QEM error for the edge

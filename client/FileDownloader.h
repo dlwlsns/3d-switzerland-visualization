@@ -7,9 +7,6 @@
 #include <iostream>
 #include <filesystem>
 #include <vector>
-//#include <thread>
-//#include <mutex>
-//#include <chrono>
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
@@ -24,14 +21,11 @@ using namespace curlpp::options;
 class FileDownloader
 {
 private:
-	//std::vector<std::thread> download_threads;
+	
 public:
 	std::string MyHTTPRequest(std::string url);
 
 	Json::Value JsonParser(std::string mystringstream);
-
-	const int MAX_DOWNLOADS = 5;
-	//std::mutex m;
 
 	// Function to extract the file name from a URL
 	static std::string get_file_name(const std::string& url);

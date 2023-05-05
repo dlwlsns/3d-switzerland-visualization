@@ -81,6 +81,39 @@ void Chunk::empty() {
     }
 }
 
+Chunk* Chunk::create(float size, int tesselation, float** heights, int x, int z)
+{
+    if (size <= 0.0f || tesselation <= 0 || heights == nullptr) {
+        std::cerr << "Invalid input parameters" << std::endl;
+        return nullptr;
+    }
+    Chunk* chunk = new Chunk(x, z);
+
+    // Compute starting coordinates and step size:
+    float triangleSize = size / (float)tesselation;
+
+    std::cout << "Generating chunk..." << std::endl;
+
+    // Generate all verticies
+    chunk->verticies.reserve(size * size);
+    for (int z = 0; z < size; z++) {
+        for (int x = 0; x < size; x++) {
+            chunk->addVertex(glm::vec3(x * triangleSize, heights[z][x], z * triangleSize));
+        }
+    }
+
+    // Generate all triangles
+    chunk->faces.reserve((size - 1) * (size - 1) * 2);
+    for (int y = 0; y < size - 1; y++) {
+        for (int x = 0; x < size - 1; x++) {
+            chunk->addFace(y * tesselation + x, (y + 1) * tesselation + x, y * tesselation + x + 1);
+            chunk->addFace((y + 1) * tesselation + x, (y + 1) * tesselation + x + 1, y * tesselation + x + 1);
+        }
+    }
+
+    return chunk;
+}
+
 // Sort edges from lower error to higher (not deleted before)
 struct compare_edges {
     inline bool operator()(const Edge* left, const Edge* right) const {
@@ -98,7 +131,7 @@ struct compare_edges {
 
 unsigned int deleted = 0;
 void Chunk::simplify(unsigned int targetVertexCount) {
-    std::cout << "Target vertex count: " << targetVertexCount << std::endl;
+    std::cout << "Simplifying... (target: " << targetVertexCount << ")" << std::endl;
 
     std::sort(edges.begin(), edges.end(), compare_edges{});
 
@@ -109,16 +142,12 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         
         // Find the edge with the lowest error        
         minErrorEdge = edges[count];
-        //std::cout << "Error:" << minErrorEdge->error << std::endl;
+        
         if (minErrorEdge->deleted || minErrorEdge->start->deleted || minErrorEdge->end->deleted) {
             minErrorEdge->deleted = true;
 
             count++;
             continue;
-        }
-        else {
-            if (deleted % 1000000 == 0)
-                std::cout << "Cycling... Size:" << verticies.size() - deleted << std::endl;
         }
 
         // Update the position of the first vertex of the edge
@@ -132,18 +161,6 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         // Collapsing the edge
         minErrorEdge->deleted = true;
         minErrorEdge->end->deleted = true;
-
-        //minErrorEdge->next->start = minErrorEdge->end;
-        // 
-        // Update the affected edges and faces
-        /*for (auto& edge : minErrorEdge->start->edges) {
-            if (edge->start == minErrorEdge->end) {
-                edge->start = minErrorEdge->start;
-            }
-            else if (edge->end == minErrorEdge->end) {
-                edge->end = minErrorEdge->start;
-            }
-        }*/
         
         deleted++;
         count++;
@@ -157,25 +174,11 @@ void Chunk::simplify(unsigned int targetVertexCount) {
                 }
             }
 
-            /*
-            for (auto& edge : edges) {
-                if (edge->end->deleted) {
-                    edge->end = minErrorEdge->start;
-                }
-            }*/
-
-            // Updating edges connected to the removed vertex
+            // Updating edges error connected to the removed vertex
             for (auto& edge : edges) {
                 if (edge->deleted) {
                     continue;
                 }
-
-                /*if (edge->start == minErrorEdge->end) {
-                    edge->start = minErrorEdge->start;
-                }
-                if (edge->end == minErrorEdge->end) {
-                    edge->end = minErrorEdge->start;
-                }*/
 
                 edge->error = edge->calculateEdgeError();
             }
@@ -190,9 +193,8 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         }
     }
 
-    /*
-    std::cout << "Removing faces.." << std::endl;
-    std::vector<Face*> newFaces;
+    // Removing faces
+    /*std::vector<Face*> newFaces;
     for (int i = 0; i < faces.size(); i++) {
         Edge* e1 = faces[i]->edge;
         Edge* e2 = e1->next;
@@ -205,9 +207,10 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         }
     }
     faces.clear();
-    faces = newFaces;*/
-    /*
-    std::cout << "Removing vertices.." << std::endl;
+    faces = newFaces;
+
+    
+    // Removing verticies
     std::vector<Vertex*> newVertecies;
     int j = 0;
     for (int i = 0; i < verticies.size(); i++) {
@@ -222,7 +225,7 @@ void Chunk::simplify(unsigned int targetVertexCount) {
         }
     }
     verticies.clear();
-    verticies = newVertecies;
+    verticies = newVertecies;*/
 
-    deleted = 0;*/
+    deleted = 0;
 }

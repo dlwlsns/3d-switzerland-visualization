@@ -18,15 +18,18 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Geotiff.cpp">
+    <ClCompile Include="fileDownloader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileDownloader.cpp">
+    <ClCompile Include="geotiff.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileDownloader.h">
+    <ClInclude Include="fileDownloader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="geotiff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

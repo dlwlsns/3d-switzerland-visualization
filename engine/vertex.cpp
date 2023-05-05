@@ -12,6 +12,4 @@ Vertex::Vertex(glm::vec3 point) {
 	idCounter++;
 }
 
-Vertex::~Vertex() {
-	
-}
+Vertex::~Vertex() {}

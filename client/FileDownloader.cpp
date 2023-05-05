@@ -1,4 +1,4 @@
-#include "FileDownloader.h"
+#include "fileDownloader.h"
 
 std::string FileDownloader::MyHTTPRequest(std::string url) {
 	std::stringstream os;
@@ -11,8 +11,6 @@ std::string FileDownloader::MyHTTPRequest(std::string url) {
 
 		// send our request to the web server
 		foo.perform();
-
-		//os << curlpp::options::Url(url);
 	}
 
 	catch (curlpp::RuntimeError& e)
@@ -84,8 +82,6 @@ void FileDownloader::download_file(const std::string& url, const std::string& ou
 		fclose(fp);
 	}
 
-	// Lock cout and print status
-	//std::lock_guard<std::mutex> lock(m);
 	std::cout << " Done" << std::endl;
 }
 
@@ -101,25 +97,8 @@ void FileDownloader::filedownloader(const std::vector<std::string>& urls) {
 	// Start downloading the files
 	int num_downloads = 0;
 	
-	//download_threads.reserve(urls.size()*3);
 	for (int i = 0; i < urls.size(); i++) {
-		/*download_threads.emplace_back(std::thread(&FileDownloader::download_file, urls[i], output_dir));
-		num_downloads++;
-		// Limit the number of simultaneous downloads
-		if (num_downloads == MAX_DOWNLOADS) {
-			for (auto& thread : download_threads) {
-				thread.join();
-			}
-			download_threads.clear();
-			num_downloads = 0;
-		}*/
 		download_file(urls[i], output_dir);
 	}
-	// Wait for the remaining downloads to finish
-	/*for (auto& thread : download_threads) {
-		thread.join();
-	}*/
-
-	//download_threads.clear();
 }
 

@@ -12,9 +12,7 @@ Face::Face(Edge* edge) {
 	idCounter++;
 }
 
-Face::~Face() {
-	//delete edge;
-}
+Face::~Face() {}
 
 glm::vec3 Face::getNormal() const {
     glm::vec3 A = edge->start->point;
