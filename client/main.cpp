@@ -180,9 +180,9 @@ int main(int argc, char* argv[]) {
 
     float filter_bbox[2][2];
 
-    //Example Lugano
-    //float posx = 8.96166;
-    //float posy = 46.00782;
+    //Example Lugano-Viganello-M. Bre
+    //float posx = 8.96803;
+    //float posy = 46.00955;
     //float r = 0.01;
 
     float posx = 0.0;
@@ -356,8 +356,8 @@ int main(int argc, char* argv[]) {
     }
 
     // Add camera to the scene
-    staticCam = new PerspectiveCamera("camera", 1.0f, 3000.0f, 45.0f, 1.0f);
-    glm::mat4 s_camera_M = glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 600.0f, 1000.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(240.0f), glm::vec3(0.0f, 1.0f, 0.0f));//* glm::rotate(glm::mat4(1.0f), glm::radians(-2.0f), glm::vec3(1.0f, 0.0f, 1.0f)) )
+    staticCam = new PerspectiveCamera("camera", 100.0f, 8000.0f, 45.0f, 1.0f);
+    glm::mat4 s_camera_M = glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 600.0f, 1000.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(240.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     staticCam->setObjectCoordinates(s_camera_M);
 
     scene->addChild(staticCam);
